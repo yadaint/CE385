@@ -1,0 +1,23 @@
+generator client {
+  provider     = "prisma-client"            // ตัวสร้างโค้ด Client รุ่นใหม่ของ Prisma 7
+  output       = "../src/generated/prisma"  // โค้ดที่สร้างออกมาไปอยู่ที่นี่ (ห้ามแก้ด้วยมือ)
+  moduleFormat = "esm"                      // ให้ออกมาเป็น ESM เพราะโปรเจกต์นี้ "type": "module"
+}
+
+datasource db {
+  provider = "postgresql"   // เราใช้ PostgreSQL — สาย url อยู่ใน prisma.config.ts
+}
+
+/// นักศึกษา — ทรัพยากรเดียวของคาบนี้ ที่จะทำ CRUD ให้ครบ
+model Student {
+  id        String   @id @default(uuid()) @db.Uuid    // กุญแจหลัก ใช้ UUID ให้ Prisma สร้างเอง
+  code      String   @unique @db.VarChar(10)          // รหัสนักศึกษา — @unique คือแนวป้องกันสุดท้าย
+  name      String   @db.VarChar(100)                 // ชื่อ–นามสกุล จำกัด 100 ตัวอักษร
+  email     String   @unique                          // อีเมล ห้ามซ้ำกับคนอื่น
+  score     Int      @default(0)                      // คะแนน ถ้าไม่ส่งมาให้เป็น 0
+  active    Boolean  @default(true)                   // ยังศึกษาอยู่หรือไม่
+  createdAt DateTime @default(now())                  // เวลาที่สร้างแถวนี้ ฐานข้อมูลใส่ให้เอง
+  updatedAt DateTime @updatedAt                       // เวลาที่แก้ครั้งล่าสุด Prisma อัปเดตให้เอง
+
+  @@map("students")  // ชื่อตารางจริงเป็นพหูพจน์ตัวเล็ก ตามธรรมเนียม SQL
+}
