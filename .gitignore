@@ -23,3 +23,9 @@ npm-debug.log*
 Thumbs.db
 .idea/
 .vscode/
+
+# Office temp lock files
+~$*
+
+# Portable git (local tooling only)
+Project Concert Booking/tools/MinGit/
