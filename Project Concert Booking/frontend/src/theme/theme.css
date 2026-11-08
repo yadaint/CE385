@@ -1,0 +1,56 @@
+/* ────────────────────────────────────────────────────────────────
+   Design tokens — ธีมหลักของเว็บ (Corporate Navy)
+   โทนน้ำเงินองค์กร เรียบ น่าเชื่อถือ ใช้ CSS variables ทั่วทั้งระบบ
+   ──────────────────────────────────────────────────────────────── */
+:root {
+  /* พื้นหลังและพื้นผิว */
+  --bg: #f1f4f8;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e2e8f0;
+
+  /* ตัวอักษร */
+  --text: #16232f;
+  --text-muted: #617083;
+
+  /* สีหลัก (ปุ่ม/ลิงก์/จุดเน้น) */
+  --primary: #1e4e8c;
+  --primary-hover: #163c6e;
+  --primary-soft: #e3ecf5;
+  --primary-soft-text: #1e4e8c;
+  --primary-contrast: #ffffff;
+
+  /* แถบนำทางด้านบน */
+  --header-bg: #122a44;
+  --header-text: #f4f7fa;
+  --header-muted: #9fb2c5;
+  --header-hover: rgba(255, 255, 255, 0.08);
+  --header-border: rgba(255, 255, 255, 0.09);
+  --header-accent: #8fb3dd;
+
+  /* แบนเนอร์ hero */
+  --hero-bg: linear-gradient(135deg, #122a44 0%, #1e4e8c 100%);
+  --hero-text: #f4f7fa;
+  --hero-muted: #b8cbde;
+
+  /* สีเชิงความหมาย (สถานะ/การแจ้งเตือน) */
+  --success-bg: #e8f5ee;
+  --success-border: #bfe3cd;
+  --success-text: #1e6a41;
+  --warn-bg: #f8f1df;
+  --warn-border: #e6d6b4;
+  --warn-text: #7a5d1e;
+  --info-bg: #e8f1f8;
+  --info-border: #c3d8ea;
+  --info-text: #1e4e8c;
+  --danger-bg: #fdeceb;
+  --danger-border: #f5c6c0;
+  --danger-text: #a13327;
+
+  /* รูปทรง */
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --shadow-card: 0 1px 2px rgba(18, 42, 68, 0.06), 0 6px 20px rgba(18, 42, 68, 0.07);
+  --font-display: inherit;
+}

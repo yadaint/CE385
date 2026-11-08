@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#020617"/>
+      <stop offset="0.6" stop-color="#111827"/>
+      <stop offset="1" stop-color="#1f2937"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.25" r="0.8">
+      <stop offset="0" stop-color="#f8fafc" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#f8fafc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect width="1200" height="675" fill="url(#spot)"/>
+
+  <!-- เปียโนเกรนด์ซิลเวอร์เตต์ -->
+  <g transform="translate(600,430)">
+    <path d="M-190 -60 q0 -50 60 -50 h180 q60 0 60 50 v90 q0 22 -22 22 h-256 q-22 0 -22 -22 z" fill="#020617" stroke="#94a3b8" stroke-width="4"/>
+    <path d="M-190 -60 q0 -50 60 -50 h180 q60 0 60 50 v10 h-300 z" fill="#111827"/>
+    <!-- คีย์ขาว -->
+    <g fill="#f8fafc">
+      <rect x="-176" y="-8" width="30" height="78" rx="2"/>
+      <rect x="-146" y="-8" width="30" height="78" rx="2"/>
+      <rect x="-116" y="-8" width="30" height="78" rx="2"/>
+      <rect x="-86" y="-8" width="30" height="78" rx="2"/>
+      <rect x="-56" y="-8" width="30" height="78" rx="2"/>
+      <rect x="-26" y="-8" width="30" height="78" rx="2"/>
+      <rect x="4" y="-8" width="30" height="78" rx="2"/>
+      <rect x="34" y="-8" width="30" height="78" rx="2"/>
+      <rect x="64" y="-8" width="30" height="78" rx="2"/>
+      <rect x="94" y="-8" width="30" height="78" rx="2"/>
+    </g>
+    <!-- คีย์ดำ -->
+    <g fill="#020617">
+      <rect x="-152" y="-8" width="18" height="46" rx="2"/>
+      <rect x="-122" y="-8" width="18" height="46" rx="2"/>
+      <rect x="-64" y="-8" width="18" height="46" rx="2"/>
+      <rect x="-36" y="-8" width="18" height="46" rx="2"/>
+      <rect x="16" y="-8" width="18" height="46" rx="2"/>
+      <rect x="44" y="-8" width="18" height="46" rx="2"/>
+      <rect x="72" y="-8" width="18" height="46" rx="2"/>
+    </g>
+    <!-- ขาเปียโน -->
+    <rect x="-160" y="112" width="22" height="70" fill="#020617" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="138" y="112" width="22" height="70" fill="#020617" stroke="#94a3b8" stroke-width="3"/>
+    <!-- โน้ตดนตรี -->
+    <g fill="#e2e8f0">
+      <circle cx="-240" cy="-90" r="14"/>
+      <rect x="-230" y="-130" width="6" height="46" rx="3"/>
+      <circle cx="-160" cy="-150" r="12"/>
+      <rect x="-151" y="-186" width="5" height="42" rx="2"/>
+      <circle cx="200" cy="-120" r="14"/>
+      <rect x="210" y="-160" width="6" height="46" rx="3"/>
+    </g>
+  </g>
+
+  <text x="600" y="130" text-anchor="middle" font-family="Georgia, serif" font-size="58" font-weight="700" fill="#e2e8f0" letter-spacing="4">Timeless Classics</text>
+  <text x="600" y="188" text-anchor="middle" font-family="Georgia, serif" font-size="30" font-style="italic" fill="#94a3b8">piano recital — one night only</text>
+</svg>

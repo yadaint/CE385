@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#500724"/>
+      <stop offset="0.5" stop-color="#be185d"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fdf4ff" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#fdf4ff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#sky)"/>
+
+  <!-- ลำแสงสปอตไลต์ -->
+  <polygon points="600,60 300,675 460,675" fill="url(#beam)" opacity="0.55"/>
+  <polygon points="600,60 740,675 900,675" fill="url(#beam)" opacity="0.55"/>
+
+  <!-- แท่งสว่างเวที -->
+  <rect x="480" y="60" width="240" height="26" rx="12" fill="#fdf4ff" opacity="0.9"/>
+
+  <!-- แท่งไฟสว่างของแฟนคลับ (light sticks) -->
+  <g stroke-linecap="round">
+    <g transform="translate(150,520)">
+      <rect x="-5" y="-60" width="10" height="60" rx="5" fill="#f9a8d4"/>
+      <rect x="-7" y="-68" width="14" height="22" rx="7" fill="#fdf4ff"/>
+      <rect x="-4" y="0" width="8" height="30" fill="#9d174d"/>
+    </g>
+    <g transform="translate(260,560)">
+      <rect x="-5" y="-60" width="10" height="60" rx="5" fill="#22d3ee"/>
+      <rect x="-7" y="-68" width="14" height="22" rx="7" fill="#cffafe"/>
+      <rect x="-4" y="0" width="8" height="30" fill="#9d174d"/>
+    </g>
+    <g transform="translate(370,530)">
+      <rect x="-5" y="-60" width="10" height="60" rx="5" fill="#fdf4ff"/>
+      <rect x="-7" y="-68" width="14" height="22" rx="7" fill="#fbcfe8"/>
+      <rect x="-4" y="0" width="8" height="30" fill="#9d174d"/>
+    </g>
+    <g transform="translate(830,540)">
+      <rect x="-5" y="-60" width="10" height="60" rx="5" fill="#22d3ee"/>
+      <rect x="-7" y="-68" width="14" height="22" rx="7" fill="#cffafe"/>
+      <rect x="-4" y="0" width="8" height="30" fill="#9d174d"/>
+    </g>
+    <g transform="translate(940,520)">
+      <rect x="-5" y="-60" width="10" height="60" rx="5" fill="#f9a8d4"/>
+      <rect x="-7" y="-68" width="14" height="22" rx="7" fill="#fdf4ff"/>
+      <rect x="-4" y="0" width="8" height="30" fill="#9d174d"/>
+    </g>
+    <g transform="translate(1050,565)">
+      <rect x="-5" y="-60" width="10" height="60" rx="5" fill="#fdf4ff"/>
+      <rect x="-7" y="-68" width="14" height="22" rx="7" fill="#fbcfe8"/>
+      <rect x="-4" y="0" width="8" height="30" fill="#9d174d"/>
+    </g>
+  </g>
+
+  <!-- คอนเฟตติ -->
+  <g opacity="0.85">
+    <rect x="180" y="200" width="14" height="8" rx="2" fill="#22d3ee" transform="rotate(25 187 204)"/>
+    <rect x="320" y="140" width="14" height="8" rx="2" fill="#fdf4ff" transform="rotate(-15 327 144)"/>
+    <rect x="470" y="200" width="14" height="8" rx="2" fill="#f9a8d4" transform="rotate(40 477 204)"/>
+    <rect x="760" y="160" width="14" height="8" rx="2" fill="#22d3ee" transform="rotate(-30 767 164)"/>
+    <rect x="900" y="220" width="14" height="8" rx="2" fill="#fdf4ff" transform="rotate(20 907 224)"/>
+    <rect x="1020" y="150" width="14" height="8" rx="2" fill="#f9a8d4" transform="rotate(-40 1027 154)"/>
+    <circle cx="240" cy="260" r="5" fill="#fdf4ff"/>
+    <circle cx="560" cy="150" r="5" fill="#22d3ee"/>
+    <circle cx="850" cy="250" r="5" fill="#f9a8d4"/>
+    <circle cx="980" cy="90" r="4" fill="#22d3ee"/>
+  </g>
+
+  <text x="600" y="330" text-anchor="middle" font-family="Arial Black, Arial" font-size="92" font-weight="900" fill="#fff" letter-spacing="4">K-POP</text>
+  <text x="600" y="415" text-anchor="middle" font-family="Arial" font-size="46" font-weight="700" fill="#fbcfe8" letter-spacing="14">WAVE 2026</text>
+</svg>

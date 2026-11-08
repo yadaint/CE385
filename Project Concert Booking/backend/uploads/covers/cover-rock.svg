@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a0a0a"/>
+      <stop offset="0.55" stop-color="#7f1d1d"/>
+      <stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde68a" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="stage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#450a0a"/>
+      <stop offset="1" stop-color="#1c0505"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#sky)"/>
+
+  <!-- ลำแสงสปอตไลต์จากเวที -->
+  <polygon points="600,240 380,675 520,675" fill="url(#beam)"/>
+  <polygon points="600,240 680,675 820,675" fill="url(#beam)"/>
+  <polygon points="600,240 180,675 300,675" fill="url(#beam)" opacity="0.6"/>
+  <polygon points="600,240 900,675 1020,675" fill="url(#beam)" opacity="0.6"/>
+
+  <!-- เวที + จอ LED -->
+  <rect x="430" y="120" width="340" height="150" rx="10" fill="url(#stage)" stroke="#fbbf24" stroke-width="4"/>
+  <rect x="560" y="270" width="80" height="90" fill="url(#stage)" stroke="#fbbf24" stroke-width="3"/>
+  <circle cx="470" cy="160" r="16" fill="#fbbf24"/>
+  <circle cx="600" cy="160" r="16" fill="#ef4444"/>
+  <circle cx="730" cy="160" r="16" fill="#fbbf24"/>
+
+  <!-- กีตาร์ไฟฟ้าซิลเวอร์เตต์ -->
+  <g transform="translate(930,300) rotate(18)">
+    <rect x="-24" y="-70" width="48" height="140" rx="10" fill="#111"/>
+    <path d="M-24 -70 q-38 20 -40 66 q-2 44 40 74 q40 -26 40 -74 q-2 -46 -40 -66 z" fill="#b91c1c" stroke="#fbbf24" stroke-width="4"/>
+    <rect x="-4" y="66" width="8" height="96" rx="3" fill="#111"/>
+    <line x1="-14" y1="-60" x2="-14" y2="150" stroke="#e5e7eb" stroke-width="2"/>
+    <line x1="0" y1="-60" x2="0" y2="150" stroke="#e5e7eb" stroke-width="2"/>
+    <line x1="14" y1="-60" x2="14" y2="150" stroke="#e5e7eb" stroke-width="2"/>
+  </g>
+
+  <!-- เงาผู้ชม -->
+  <g fill="#0c0404">
+    <circle cx="150" cy="600" r="34"/>
+    <circle cx="260" cy="620" r="42"/>
+    <circle cx="380" cy="600" r="34"/>
+    <circle cx="520" cy="628" r="46"/>
+    <circle cx="660" cy="608" r="38"/>
+    <circle cx="800" cy="626" r="44"/>
+    <circle cx="940" cy="602" r="34"/>
+    <circle cx="1060" cy="622" r="40"/>
+    <rect x="116" y="600" width="68" height="75"/>
+    <rect x="228" y="620" width="84" height="55"/>
+    <rect x="484" y="628" width="92" height="47"/>
+    <rect x="772" y="626" width="88" height="49"/>
+    <rect x="1030" y="622" width="80" height="53"/>
+  </g>
+  <g stroke="#fbbf24" stroke-width="5" stroke-linecap="round">
+    <line x1="150" y1="560" x2="130" y2="470"/>
+    <line x1="520" y1="580" x2="548" y2="470"/>
+    <line x1="940" y1="560" x2="962" y2="468"/>
+  </g>
+
+  <!-- ชื่อคอนเสิร์ต -->
+  <text x="430" y="70" text-anchor="middle" font-family="Arial Black, Arial" font-size="56" font-weight="900" fill="#fff" letter-spacing="6">ROCK LEGEND</text>
+  <text x="430" y="118" text-anchor="middle" font-family="Arial" font-size="30" font-weight="700" fill="#fbbf24" letter-spacing="10">LIVE 2026</text>
+</svg>

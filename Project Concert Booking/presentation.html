@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BOOKING TICKET CONCERT — Presentation</title>
+<style>
+  :root {
+    --navy: #122A44; --navy2: #1E4E8C; --gold: #FBBF24; --ink: #16232F;
+    --muted: #617083; --soft: #E3ECF5; --line: #E2E8F0; --page: #F1F4F8;
+    --success: #1E6A41; --success-bg: #E8F5EE; --warn: #7A5D1E; --warn-bg: #F8F1DF;
+    --danger: #A13327; --danger-bg: #FDECEB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Leelawadee UI", "Noto Sans Thai", sans-serif;
+    background: #0b1220; color: var(--ink); overflow: hidden;
+  }
+  .deck { position: relative; width: 100vw; height: 100vh; }
+  .slide {
+    position: absolute; inset: 0; display: none; flex-direction: column;
+    background: var(--page); padding: 48px 72px 96px; overflow: auto;
+  }
+  .slide.active { display: flex; animation: fade 0.35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .slide.dark { background: var(--navy); color: #fff; justify-content: center; align-items: center; text-align: center; }
+  .topbar { height: 10px; background: var(--navy2); }
+  .dark .topbar { background: var(--gold); }
+  h1 { font-size: 64px; font-weight: 900; letter-spacing: 3px; }
+  h2 { font-size: 40px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+  .dark h2 { color: #fff; }
+  .kicker { font-size: 14px; font-weight: 700; letter-spacing: 6px; color: var(--gold); text-transform: uppercase; margin-bottom: 18px; }
+  .sub { font-size: 20px; color: var(--muted); }
+  .dark .sub { color: #B8CBDE; }
+  .grid { display: grid; gap: 22px; margin-top: 28px; }
+  .grid.cols3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.cols2 { grid-template-columns: repeat(2, 1fr); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 24px 26px; }
+  .card h3 { font-size: 20px; color: var(--navy2); margin-bottom: 10px; }
+  .card p, .card li { font-size: 16px; line-height: 1.65; color: var(--ink); }
+  ul.check { list-style: none; }
+  ul.check li { padding-left: 30px; position: relative; margin-bottom: 10px; }
+  ul.check li::before { content: "✓"; position: absolute; left: 0; color: var(--navy2); font-weight: 800; }
+  /* flow */
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 30px; }
+  .step { text-align: center; }
+  .step .num {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--navy2); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; margin: 0 auto 12px;
+  }
+  .step b { font-size: 18px; display: block; margin-bottom: 4px; }
+  .step span { font-size: 14px; color: var(--muted); }
+  /* ticket code */
+  .code {
+    font-family: Consolas, monospace; font-size: 56px; font-weight: 800; letter-spacing: 10px;
+    background: var(--navy); color: #fff; border-radius: 16px; padding: 22px 40px; display: inline-block;
+  }
+  .code .th { color: var(--gold); } .code .zn { color: #8FB3DD; } .code .st { color: #86EFAC; }
+  .legend { display: grid; grid-template-columns: 200px 1fr; gap: 14px; margin-top: 26px; text-align: left; }
+  .legend .chip {
+    font-family: Consolas, monospace; font-weight: 800; font-size: 20px; text-align: center;
+    padding: 10px; border-radius: 10px;
+  }
+  .legend p { font-size: 17px; align-self: center; }
+  /* lifecycle */
+  .life { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
+  .life .row { display: grid; grid-template-columns: 170px 170px 1fr; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; }
+  .badge { font-family: Consolas, monospace; font-weight: 800; text-align: center; padding: 8px; border-radius: 10px; }
+  /* table-ish rows */
+  .rows .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 20px; margin-bottom: 12px; }
+  .rows .row b { color: var(--navy2); font-size: 18px; }
+  .rows .row p { font-size: 15.5px; line-height: 1.6; }
+  .models .row { grid-template-columns: 260px 1fr; }
+  .models .row b { font-family: Consolas, monospace; color: #fff; background: var(--navy); padding: 6px 14px; border-radius: 8px; }
+  /* nav */
+  .nav {
+    position: fixed; bottom: 24px; right: 32px; display: flex; gap: 10px; z-index: 10;
+  }
+  .nav button {
+    width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--navy2); color: #fff;
+    font-size: 22px; cursor: pointer; transition: transform 0.15s;
+  }
+  .nav button:hover { transform: scale(1.1); }
+  .counter { position: fixed; bottom: 34px; left: 40px; color: #8FA3B8; font-size: 15px; z-index: 10; }
+  .progress { position: fixed; top: 0; left: 0; height: 5px; background: var(--gold); z-index: 10; transition: width 0.3s; }
+  .foot { margin-top: auto; font-size: 14px; color: #9FB2C5; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 26px; }
+  .big { font-size: 26px; font-weight: 800; color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+  <!-- 1 ปก -->
+  <section class="slide dark active">
+    <div class="kicker">WEB APPLICATION PROJECT · CE385</div>
+    <h1>BOOKING TICKET CONCERT</h1>
+    <p class="sub" style="margin-top:20px; max-width:900px;">ระบบจองตั๋วคอนเสิร์ตออนไลน์ — เลือกโซน เลือกที่นั่ง ชำระเงินผ่านสลิป<br/>และรับบัตรเข้างานพร้อม QR Code รายที่นั่ง ครบในที่เดียว</p>
+    <p class="foot" style="margin-top:60px;">React + TypeScript · Express + Prisma + PostgreSQL · Tailwind CSS · i18n (ไทย/EN)</p>
+  </section>
+
+  <!-- 2 ภาพรวม -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">OVERVIEW</div>
+    <h2>ภาพรวมโปรเจกต์</h2>
+    <div class="grid cols3">
+      <div class="card"><h3>🎯 โจทย์</h3><p>การจองบัตรคอนเสิร์ตแบบเดิมมีข้อจำกัดเรื่องผังที่นั่ง คิวยาว การยืนยันการชำระเงินไม่ชัดเจน และไม่รู้สถานะบัตรแบบเรียลไทม์</p></div>
+      <div class="card"><h3>💡 โซลูชัน</h3><p>เว็บแอปจองตั๋วครบวงจร — ผู้ใช้เลือกผังโซนและที่นั่งเองจากผังจริง โอนเงินพร้อมแนบสลิป แอดมินตรวจและอนุมัติ จองสำเร็จได้บัตร QR</p></div>
+      <div class="card"><h3>🎫 ผลลัพธ์</h3><p>บัตรเข้างานพร้อม QR รายที่นั่ง รหัสตั๋วมาตรฐาน 10 ตัว สถิติรายคอนพร้อมรายงาน PDF/CSV และรองรับสองภาษา</p></div>
+    </div>
+    <p class="sub" style="margin-top:30px;">ทุกสถานที่ใช้<b>ผังมาตรฐานเดียวกัน</b> (Standard End Stage): Standing ชิดเวที → VIP → Platinum → Gold → Silver → Balcony</p>
+  </section>
+
+  <!-- 3 Tech Stack -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">TECH STACK</div>
+    <h2>เทคโนโลยีที่ใช้</h2>
+    <div class="grid cols3">
+      <div class="card"><h3>Frontend</h3><ul class="check"><li>React 18 + TypeScript</li><li>Tailwind CSS (Design Token)</li><li>react-router-dom v6</li><li>react-i18next — ไทย / English</li><li>react-qr-code — ตั๋ว QR</li><li>Vite + axios</li></ul></div>
+      <div class="card"><h3>Backend</h3><ul class="check"><li>Node.js + Express + TypeScript</li><li>Prisma ORM + PostgreSQL</li><li>JWT Authentication</li><li>bcrypt (12 rounds)</li><li>multer — อัปโหลดสลิป/ปก</li><li>Auto-close sales job (ทุก 60 วิ)</li></ul></div>
+      <div class="card"><h3>Tools & Export</h3><ul class="check"><li>jsPDF + html2canvas — รายงาน PDF</li><li>CSV (UTF-8 BOM) เปิดใน Excel</li><li>Zod — validate สองชั้น</li><li>SVG — ปกคอนเซปต์รายคอน</li><li>nodemon + ts-node</li><li>pptxgenjs — สไลด์นำเสนอ</li></ul></div>
+    </div>
+  </section>
+
+  <!-- 4 ฟีเจอร์ผู้ใช้ -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">USER FEATURES</div>
+    <h2>ฟีเจอร์สำหรับผู้ใช้</h2>
+    <div class="rows">
+      <div class="row"><div><b>สมัครสมาชิก + ยืนยันตัวตน</b></div><p>ชื่อ-นามสกุล · วันเกิด · เบอร์โทร · เลขบัตรประชาชน 13 หลัก (ตรวจ checksum) · เลขหลังบัตร (Laser code) — ตรวจทั้ง client และ server</p></div>
+      <div class="row"><div><b>ผังโซนวงแหวนรอบเวที</b></div><p>Standing ชิดเวทีสุด → VIP → Platinum → Gold → Silver → Balcony พร้อม % การจองรายโซน</p></div>
+      <div class="row"><div><b>เลือกที่นั่งรายตัว</b></div><p>สถานะทุกที่นั่งเรียลไทม์: ว่าง / รอตรวจสอบ / ยืนยันแล้ว — จองได้สูงสุด 4 ที่นั่งต่อรอบ</p></div>
+      <div class="row"><div><b>ชำระเงิน + นับถอยหลัง</b></div><p>โอนเข้าบัญชีกสิกรไทย พร้อมนับถอยหลังชำระ 10 นาที และแนบสลิปเพื่อรอแอดมินตรวจสอบ</p></div>
+      <div class="row"><div><b>ตั๋วเข้างาน + QR รายที่นั่ง</b></div><p>รหัสตั๋วมาตรฐาน 10 ตัว พร้อม QR ตรวจสอบหน้างาน แสดงเมื่อสลิปได้รับอนุมัติ</p></div>
+      <div class="row"><div><b>สองภาษา + ลบบัญชีเอง</b></div><p>ไทย / English สลับได้ทันทีทุกหน้า และผู้ใช้สามารถลบบัญชีพร้อมข้อมูลการจองได้ด้วยตัวเอง</p></div>
+    </div>
+  </section>
+
+  <!-- 5 Flow -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">BOOKING FLOW</div>
+    <h2>ขั้นตอนการจองบัตร</h2>
+    <div class="flow">
+      <div class="step"><div class="num">1</div><b>เลือกคอนเสิร์ต</b><span>จากหน้าแรก กรองตามประเภท</span></div>
+      <div class="step"><div class="num">2</div><b>เลือกวันที่แสดง</b><span>รอบการแสดงได้หลายวัน</span></div>
+      <div class="step"><div class="num">3</div><b>เลือกโซนจากผัง</b><span>วงแหวนราคาตามชั้นบัตร</span></div>
+      <div class="step"><div class="num">4</div><b>เลือกที่นั่งรายตัว</b><span>สถานะเรียลไทม์ทุกที่นั่ง</span></div>
+      <div class="step"><div class="num">5</div><b>ยืนยันการจอง</b><span>ถือที่นั่ง + นับถอยหลัง 10 นาที</span></div>
+      <div class="step"><div class="num">6</div><b>โอนเงิน + แนบสลิป</b><span>รอแอดมินอนุมัติ</span></div>
+      <div class="step"><div class="num">7</div><b>รับตั๋ว QR</b><span>จองสำเร็จ พร้อมเข้างาน</span></div>
+    </div>
+    <p class="sub" style="margin-top:40px;">⚠ ไม่ชำระภายใน 10 นาที → สถานะคงเป็น "รอชำระเงิน" พร้อมนับถอยหลังบนหน้า <b>ตั๋วของฉัน</b> — ผู้ใช้ยกเลิกเองได้</p>
+  </section>
+
+  <!-- 6 รหัสตั๋ว -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">TICKET CODE</div>
+    <h2>รหัสตั๋วมาตรฐาน 10 ตัวอักษร — 1 ที่นั่ง = 1 บัตร</h2>
+    <div style="text-align:center; margin-top:40px;">
+      <span class="code"><span class="th">THA</span><span class="zn">GD</span><span class="st">14</span>K7X</span>
+      <p class="sub" style="margin-top:16px;">ตัวอย่าง: Gold ที่นั่งเบอร์ 14 ของคอนไทย — จองหลายที่นั่งได้บัตรครบทุกที่นั่ง</p>
+    </div>
+    <div class="legend">
+      <div class="chip" style="background:#1E3A5F; color:var(--gold);">THA / NAT</div><p><b>ประเภทคอนเสิร์ต</b> — คอนไทย (THA) หรือคอนต่างประเทศ (NAT)</p>
+      <div class="chip" style="background:#1E3A5F; color:#8FB3DD;">GD</div><p><b>รหัสโซนที่นั่ง 2 ตัว</b> — เช่น GD = Gold Center</p>
+      <div class="chip" style="background:#1E3A5F; color:#86EFAC;">14</div><p><b>เลขที่นั่ง 2 ตัว (01-99)</b> — ตามที่นั่งที่ทำการจอง</p>
+      <div class="chip" style="background:#334155; color:#fff;">K7X</div><p><b>รหัสสุ่มจากระบบ 3 ตัว</b> — กันการซ้ำ</p>
+    </div>
+  </section>
+
+  <!-- 7 Lifecycle -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">SALE LIFECYCLE</div>
+    <h2>รอบชีวิตการขายบัตร</h2>
+    <div class="life">
+      <div class="row"><div class="badge" style="background:#F1F5F9; color:#64748B;">DRAFT</div><div class="badge" style="background:#F1F5F9; color:#64748B;">ฉบับร่าง</div><p>สร้างใหม่ ยังไม่เปิดจอง — อยู่ในเมนู "แบบร่าง" ลบหรือแก้ไขได้</p></div>
+      <div class="row"><div class="badge" style="background:var(--success-bg); color:var(--success);">OPEN</div><div class="badge" style="background:var(--success-bg); color:var(--success);">เปิดขาย</div><p>ผู้ใช้เห็นและจองได้ — ระบบปิดอัตโนมัติเมื่อถึง <b>วันสุดท้ายของการขาย</b> (ตรวจทุก 60 วินาที)</p></div>
+      <div class="row"><div class="badge" style="background:var(--warn-bg); color:var(--warn);">CLOSED</div><div class="badge" style="background:var(--warn-bg); color:var(--warn);">ปิดขาย</div><p>ปิดชั่วคราวหรือหมดเวลา — เปิดใหม่ได้</p></div>
+      <div class="row"><div class="badge" style="background:var(--danger-bg); color:var(--danger);">SOLD_OUT</div><div class="badge" style="background:var(--danger-bg); color:var(--danger);">บัตรหมด</div><p>ทุกโซนเปิดขายหมด — ระบบตั้งสถานะอัตโนมัติ</p></div>
+      <div class="row"><div class="badge" style="background:var(--danger-bg); color:var(--danger);">CANCELLED</div><div class="badge" style="background:var(--danger-bg); color:var(--danger);">ยกเลิกถาวร</div><p>ยกเลิกกลางคันเพื่อป้องกันปัญหา — <b>แก้ไขข้อมูลไม่ได้อีก</b></p></div>
+    </div>
+  </section>
+
+  <!-- 8 แอดมิน -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">ADMIN FEATURES</div>
+    <h2>ฟีเจอร์สำหรับแอดมิน</h2>
+    <div class="rows">
+      <div class="row"><div><b>สถิติรายคอนเสิร์ต</b></div><p>เลือกคอน (แยกหมวดเปิดขาย/ปิดขาย) → รายได้รวม รายได้รายโซน สถานะบัตรทั้งหมด + ตารางรายโซน</p></div>
+      <div class="row"><div><b>จัดการคอนเสิร์ต (เรียลไทม์)</b></div><p>ผังโซนวงแหวน + สถานะทุกที่นั่ง ว่าง/รอตรวจสอบ/ยืนยันแล้ว — รีเฟรชอัตโนมัติทุก 10 วินาที</p></div>
+      <div class="row"><div><b>รายการตรวจสอบสลิป</b></div><p>ดูสลิป อนุมัติ/ปฏิเสธพร้อมเหตุผล — บันทึกชื่อแอดมินผู้ตรวจทุกรายการ</p></div>
+      <div class="row"><div><b>Export PDF + CSV</b></div><p>ส่งออกรายงานสถิติและรายการจองเป็นเอกสาร (PDF แบ่งหน้าอัตโนมัติ / CSV UTF-8 เปิดใน Excel)</p></div>
+      <div class="row"><div><b>สร้าง + แก้ไข + แบบร่าง</b></div><p>ปกคอนเซปต์ (16:9) · ชื่อ 2 ภาษา · วันสุดท้ายขาย (ปิดอัตโนมัติ) · ยกเลิกการขายกลางคัน · ลบแบบร่างได้</p></div>
+    </div>
+  </section>
+
+  <!-- 9 Data model -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">DATA MODEL</div>
+    <h2>โครงสร้างฐานข้อมูล (Prisma + PostgreSQL)</h2>
+    <div class="rows models">
+      <div class="row"><b>User</b><p>บัญชี + ข้อมูลยืนยันตัวตน (ชื่อ / เบอร์ / เลขบัตรหน้า-หลัง / วันเกิด) — ลบบัญชีเองได้</p></div>
+      <div class="row"><b>Concert</b><p>คอนเสิร์ต + ชื่อ 2 ภาษา + ปกคอนเซปต์ + saleEndDate (ปิดขายอัตโนมัติ)</p></div>
+      <div class="row"><b>Venue + VenueZone</b><p>ผังโซน FIX ประจำสถานที่ — ทุกสถานที่ใช้ผังมาตรฐานเดียวกัน</p></div>
+      <div class="row"><b>Zone + Seat</b><p>โซนขายบัตรรายคอน + ที่นั่งรายตัว (isAvailable อัปเดตแบบ transaction)</p></div>
+      <div class="row"><b>Booking + BookingSeat</b><p>การจองถือที่นั่ง + <b>รหัสตั๋วรายที่นั่ง</b> (SERIALIZABLE transaction + retry)</p></div>
+      <div class="row"><b>Payment</b><p>สลิป + สถานะ + ผู้ตรวจ (reviewedBy) + เวลาตรวจ</p></div>
+      <div class="row"><b>Notification</b><p>แจ้งเตือนบัตรหมดรายโซน/ทั้งคอน อัตโนมัติ</p></div>
+    </div>
+    <p class="sub" style="margin-top:18px;">ทุกความสัมพันธ์กำหนด onDelete: Cascade — ลบคอน/ลบบัญชี แล้วข้อมูลลูกถูกจัดการอัตโนมัติ</p>
+  </section>
+
+  <!-- 10 สรุป -->
+  <section class="slide dark">
+    <div class="kicker">SUMMARY</div>
+    <h2>สรุปโปรเจกต์</h2>
+    <div style="max-width:1000px; text-align:left; margin-top:30px;">
+      <ul class="check" style="font-size:20px;">
+        <li style="color:#E8EEF6;">ระบบจองตั๋วครบวงจร ตั้งแต่เลือกที่นั่งจนได้บัตร QR เข้างาน</li>
+        <li style="color:#E8EEF6; margin-top:14px;">ผังโซนมาตรฐานสากล เหมือนกันทุกสถานที่ ทั้งหน้าสร้างและหน้าจอง</li>
+        <li style="color:#E8EEF6; margin-top:14px;">รหัสตั๋วมาตรฐาน 10 ตัว รายที่นั่ง พร้อม QR สแกนเข้างาน</li>
+        <li style="color:#E8EEF6; margin-top:14px;">ปิดขายอัตโนมัติตามวันสุดท้าย + ยกเลิกการขายกลางคัน + ลบแบบร่าง</li>
+        <li style="color:#E8EEF6; margin-top:14px;">สถิติรายคอน 3 มุมมอง ส่งออกรายงาน PDF / CSV ได้</li>
+        <li style="color:#E8EEF6; margin-top:14px;">สองภาษา ไทย/English — ผู้ใช้ลบบัญชีตัวเองได้</li>
+      </ul>
+    </div>
+    <p class="foot" style="margin-top:70px;">BOOKING TICKET CONCERT — ขอบคุณครับ 🎫</p>
+  </section>
+</div>
+
+<div class="counter" id="counter"></div>
+<div class="progress" id="progress"></div>
+<div class="nav">
+  <button onclick="go(-1)" title="ก่อนหน้า">‹</button>
+  <button onclick="go(1)" title="ถัดไป">›</button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  let cur = 0;
+  const counter = document.getElementById("counter");
+  const progress = document.getElementById("progress");
+
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle("active", i === cur));
+    counter.textContent = `${cur + 1} / ${slides.length}`;
+    progress.style.width = ((cur + 1) / slides.length) * 100 + "%";
+  }
+  function go(dir) {
+    cur = Math.min(slides.length - 1, Math.max(0, cur + dir));
+    render();
+  }
+  document.addEventListener("keydown", (e) => {
+    if (["ArrowRight", "PageDown", " "].includes(e.key)) go(1);
+    if (["ArrowLeft", "PageUp"].includes(e.key)) go(-1);
+    if (e.key === "Home") { cur = 0; render(); }
+    if (e.key === "End") { cur = slides.length - 1; render(); }
+  });
+  render();
+</script>
+</body>
+</html>

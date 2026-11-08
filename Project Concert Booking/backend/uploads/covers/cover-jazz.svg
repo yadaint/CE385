@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#020617"/>
+      <stop offset="0.55" stop-color="#1e1b4b"/>
+      <stop offset="1" stop-color="#312e81"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#fbbf24" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#fbbf24" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#sky)"/>
+
+  <!-- ดวงจร + ดาว -->
+  <circle cx="880" cy="130" r="52" fill="#fde68a"/>
+  <circle cx="856" cy="116" r="46" fill="#1e1b4b"/>
+  <g fill="#e2e8f0">
+    <circle cx="120" cy="80" r="3"/><circle cx="220" cy="150" r="2.5"/><circle cx="340" cy="60" r="3"/>
+    <circle cx="460" cy="110" r="2"/><circle cx="700" cy="70" r="3"/><circle cx="1020" cy="200" r="2.5"/>
+    <circle cx="1100" cy="90" r="3"/><circle cx="80" cy="220" r="2"/><circle cx="520" cy="40" r="2.5"/>
+  </g>
+
+  <!-- สปอตไลต์บนแซกโซโฟน -->
+  <circle cx="600" cy="330" r="230" fill="url(#spot)"/>
+
+  <!-- แซกโซโฟนซิลเวอร์เตต์ -->
+  <g transform="translate(600,340)" stroke="#fbbf24" stroke-width="10" fill="none" stroke-linecap="round">
+    <path d="M-60 -110 q10 -40 46 -36 q40 6 36 60 q-4 56 -40 96 q-36 42 -20 88 q14 40 60 34 q44 -8 40 -52"/>
+    <circle cx="62" cy="-60" r="9" fill="#fbbf24" stroke="none"/>
+    <circle cx="30" cy="0" r="9" fill="#fbbf24" stroke="none"/>
+    <circle cx="-8" cy="60" r="9" fill="#fbbf24" stroke="none"/>
+    <circle cx="-2" cy="128" r="12" fill="#fbbf24" stroke="none"/>
+  </g>
+
+  <!-- เส้นขอบเมืองยามค่ำ -->
+  <g fill="#0f0d2e">
+    <rect x="0" y="520" width="180" height="155"/>
+    <rect x="200" y="560" width="140" height="115"/>
+    <rect x="360" y="540" width="110" height="135"/>
+    <rect x="730" y="555" width="150" height="120"/>
+    <rect x="900" y="530" width="120" height="145"/>
+    <rect x="1050" y="565" width="150" height="110"/>
+  </g>
+  <g fill="#fbbf24" opacity="0.6">
+    <rect x="30" y="545" width="10" height="12"/><rect x="70" y="570" width="10" height="12"/>
+    <rect x="240" y="585" width="10" height="12"/><rect x="400" y="565" width="10" height="12"/>
+    <rect x="780" y="580" width="10" height="12"/><rect x="950" y="555" width="10" height="12"/>
+    <rect x="1100" y="590" width="10" height="12"/>
+  </g>
+
+  <text x="600" y="240" text-anchor="middle" font-family="Georgia, serif" font-size="76" font-weight="700" fill="#fbbf24" letter-spacing="10">JAZZ</text>
+  <text x="600" y="300" text-anchor="middle" font-family="Georgia, serif" font-size="36" font-style="italic" fill="#e2e8f0">under the stars</text>
+</svg>
