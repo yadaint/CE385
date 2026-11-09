@@ -14,7 +14,7 @@ import Spinner from "../components/Spinner";
 import { getApiErrorMessage } from "../services/api";
 import { bookingService } from "../services/bookingService";
 import type { BookingCheckResult } from "../types";
-import { formatCurrency, formatDateTime } from "../utils/format";
+import { calculateVat, formatCurrency, formatDateTime } from "../utils/format";
 
 /** ข้อมูลบัญชีธนาคารสำหรับโอนชำระเงิน */
 const BANK_INFO = {
@@ -237,12 +237,32 @@ export default function PaymentPage() {
               <dt className="text-muted">{t("payment.accountName")}</dt>
               <dd className="font-bold text-ink">{BANK_INFO.accountName}</dd>
             </div>
+            {/* แยกยอดก่อน VAT + ภาษี 7% ก่อนยอดที่ต้องชำระ */}
+            <div className="flex items-center justify-between gap-3">
+              <dt className="text-muted">{t("payment.vatBeforeLabel")}</dt>
+              <dd className="text-ink">
+                {(() => {
+                  const vat = calculateVat(booking.totalPrice);
+                  return formatCurrency(vat.beforeVat);
+                })()}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <dt className="text-muted">{t("payment.vatLabel")}</dt>
+              <dd className="text-ink">
+                {(() => {
+                  const vat = calculateVat(booking.totalPrice);
+                  return formatCurrency(vat.vat);
+                })()}
+              </dd>
+            </div>
             <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
               <dt className="font-bold text-ink">{t("payment.amountDue")}</dt>
               <dd className="font-display text-2xl font-extrabold text-primary">
                 {formatCurrency(booking.totalPrice)}
               </dd>
             </div>
+            <p className="text-right text-xs text-muted">{t("payment.vatIncludedNote")}</p>
           </dl>
 
           {/* สรุปการจอง */}

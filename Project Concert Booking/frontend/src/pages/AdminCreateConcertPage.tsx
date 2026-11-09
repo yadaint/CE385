@@ -299,8 +299,8 @@ export default function AdminCreateConcertPage() {
   return (
     <div className="min-h-screen bg-slate-100 pb-16">
       <div className="mx-auto max-w-3xl px-4 py-10">
-        <Link to="/" className="text-sm font-medium text-violet-600 hover:text-violet-700">
-          ← กลับไปหน้าคอนเสิร์ต
+        <Link to="/admin" className="text-sm font-medium text-violet-600 hover:text-violet-700">
+          ← กลับหน้าหลังบ้าน
         </Link>
         <h1 className="mt-3 text-3xl font-extrabold text-slate-900">สร้างคอนเสิร์ตใหม่</h1>
         <p className="mt-1 text-sm text-slate-500">

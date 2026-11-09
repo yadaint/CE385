@@ -8,8 +8,15 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localho
 /** Origin ของ API server (ตัด /api/v1 ออก) — ใช้เข้าถึงไฟล์ที่อัปโหลด เช่น สลิป */
 export const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1$/, "");
 
-/** แปลง path ของไฟล์ที่อัปโหลด (เช่น /uploads/slips/xx.png) เป็น URL เต็ม */
-export const getUploadUrl = (path: string): string => `${API_ORIGIN}${path}`;
+/**
+ * แปลง path ของไฟล์ที่อัปโหลด (เช่น /uploads/slips/xx.png) เป็น URL เต็มของ backend
+ * — ถ้าค่าที่ส่งมาเป็น URL เต็ม (https://...) อยู่แล้วคืนค่าเดิม และคืนค่าว่างถ้าไม่มี path
+ */
+export const getUploadUrl = (path: string): string => {
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${API_ORIGIN}${path}`;
+};
 
 /** localStorage key ที่ใช้เก็บ JWT */
 export const TOKEN_STORAGE_KEY = "booking-ticket-concert.jwt";

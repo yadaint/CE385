@@ -10,6 +10,26 @@ const thbFormatter = new Intl.NumberFormat("th-TH", {
 
 export const formatCurrency = (amount: number): string => thbFormatter.format(amount);
 
+/* ─── ภาษีมูลค่าเพิ่ม (VAT) 7% ─── ราคาบัตรที่เก็บจริงเป็น "ราคารวม VAT" แล้ว จึงแยกย่อยออกมาแสดง */
+
+export const VAT_RATE = 0.07;
+
+export interface VatBreakdown {
+  /** ยอดก่อน VAT */
+  beforeVat: number;
+  /** ภาษีมูลค่าเพิ่ม 7% */
+  vat: number;
+  /** ยอดรวมที่ผู้ซื้อจ่ายจริง (รวม VAT แล้ว) */
+  total: number;
+}
+
+/** แยกยอดรวม (รวม VAT) ออกเป็น ยอดก่อน VAT + VAT 7% ปัดเงิน 2 ตำแหน่ง */
+export const calculateVat = (totalWithVat: number): VatBreakdown => {
+  const total = Math.round(totalWithVat * 100) / 100;
+  const beforeVat = Math.round((total / (1 + VAT_RATE)) * 100) / 100;
+  return { beforeVat, vat: Math.round((total - beforeVat) * 100) / 100, total };
+};
+
 /** จัดรูปแบบวันที่ตามภาษาที่เลือก เช่น "ส. 12 ธ.ค. 2569, 19:00" / "Sat, 12 Dec 2026, 19:00" */
 export const formatDateTime = (isoDate: string): string =>
   new Intl.DateTimeFormat(currentLocale(), {

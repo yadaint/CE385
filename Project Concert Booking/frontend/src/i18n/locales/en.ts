@@ -12,10 +12,12 @@ export const en = {
     concerts: "Concerts",
     myTickets: "My Tickets",
     drafts: "Drafts",
-    stats: "Statistics",
+    stats: "Stats & Info",
     verifySlips: "Slip Review",
     allBookings: "All Bookings",
     createConcert: "Create Concert",
+    addStaff: "Add Admin",
+    backOffice: "Back office",
     login: "Log in",
     register: "Sign up",
     logout: "Log out",
@@ -190,14 +192,33 @@ export const en = {
     required: "*",
   },
 
+  /** Back-office login page texts (separate from the user login) */
+  adminAuth: {
+    title: "Back-office login",
+    subtitle:
+      "Use the shared admin email + your own personal password — the latest login becomes the on-duty admin",
+    email: "Admin email",
+    password: "Admin password",
+    submit: "Log in to back office",
+    loggingIn: "Verifying credentials...",
+    badge: "Restricted area — admins only",
+    notAdminNote:
+      "Regular user accounts cannot sign in here — an ADMIN account is required. If you are a regular user, please use the main website login",
+    backToSite: "← Back to main website",
+    demoTitle: "Demo admin account (after running seed)",
+  },
+
   account: {
     deleteTitle: "Danger zone — Delete account",
     deleteDesc:
       "Deleting your account permanently removes all your bookings, tickets and slips. This cannot be undone — please settle any pending bookings first",
     deleteButton: "Delete my account",
     deleting: "Deleting account...",
-    deleteConfirm:
-      "Permanently delete your account? All bookings, tickets and slips will be removed and cannot be recovered",
+    deleteConfirmTitle: "Confirm permanent account deletion",
+    deleteConfirmWarning:
+      "Warning: if you confirm, all of your data (account, bookings, tickets and slips) will be permanently removed from the database and can never be recovered — however, if you still hold unexpired concert tickets, the system will not allow account deletion until they are used or the bookings cancelled",
+    deleteConfirmYes: "Delete account permanently",
+    deleteConfirmNo: "Cancel",
     deleted: "Your account has been deleted. Thank you for using our service",
   },
 
@@ -241,6 +262,11 @@ export const en = {
     entryBadge: "ENTRY TICKET",
     scanAtGate: "Show this QR",
     atGate: "at the entrance",
+    perSeatCodes: "Per-seat ticket codes (1 seat = 1 code)",
+    printReceipt: "Print receipt",
+    vatBeforeLabel: "Amount before VAT (7%)",
+    vatLabel: "Value added tax (VAT 7%)",
+    vatIncludedNote: "Price includes 7% VAT",
   },
 
   payment: {
@@ -262,6 +288,9 @@ export const en = {
     copy: "Copy",
     copied: "Account number copied",
     amountDue: "Amount due",
+    vatBeforeLabel: "Amount before VAT (7%)",
+    vatLabel: "Value added tax (VAT 7%)",
+    vatIncludedNote: "Price includes 7% VAT",
     ticketCode: "Ticket code",
     quantity: "Quantity",
     zone: "Zone",
@@ -572,7 +601,9 @@ export const en = {
       submittedAt: "Slip submitted",
       bookingId: "Booking ID",
       approvedMsg: "Reviewed and approved",
+      approvedBy: "Approved by code",
       rejectedMsg: "Rejected",
+      rejectedBy: "Rejected by code",
       byAdmin: "by admin",
       when: "at {{date}}",
       noteLabel: "Note",

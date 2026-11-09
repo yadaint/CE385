@@ -125,9 +125,9 @@ const headerBar = (slide, title) => {
     ["สมัครสมาชิก + ยืนยันตัวตน", "ชื่อ-นามสกุล · วันเกิด · เบอร์โทร · เลขบัตรประชาชน 13 หลัก (ตรวจ checksum) · เลขหลังบัตร (Laser code)"],
     ["ผังโซนวงแหวนรอบเวที", "Standing ชิดเวทีสุด → VIP → Platinum → Gold → Silver → Balcony พร้อม % การจองรายโซน"],
     ["เลือกที่นั่งรายตัว", "สถานะเรียลไทม์: ว่าง / รอตรวจสอบ / ยืนยันแล้ว — จองได้สูงสุด 4 ที่นั่งต่อรอบ"],
-    ["ชำระเงิน + นับถอยหลัง", "โอนเข้าบัญชีกสิกรไทย พร้อมนับถอยหลังชำระ 10 นาที และแนบสลิปเพื่อรอแอดมินตรวจ"],
-    ["ตั๋วเข้างาน + QR รายที่นั่ง", "รหัสตั๋วมาตรฐาน 10 ตัว พร้อม QR ตรวจสอบหน้างาน แสดงเมื่อสลิปได้รับอนุมัติ"],
-    ["สองภาษา + ลบบัญชีได้เอง", "ไทย / English สลับได้ทันทีทุกหน้า และผู้ใช้สามารถลบบัญชีพร้อมข้อมูลการจองได้ด้วยตัวเอง"],
+    ["ชำระเงิน + นับถอยหลัง", "โอนเข้าบัญชีกสิกรไทย นับถอยหลัง 10 นาที แนบสลิปรอตรวจ — แสดงยอดก่อน VAT / VAT 7% / ยอดรวม"],
+    ["บัตรรวมทุกรหัส + QR + ใบเสร็จ", "บัตรใบเดียวรวมรหัสตั๋วทุกที่นั่งเรียงแนวนอน (มีเลขที่นั่งในวงเล็บเมื่อซื้อหลายใบ) · QR มีรหัสครบทุกใน · ปุ่มพิมพ์ใบเสร็จรับเงินแยก VAT"],
+    ["สองภาษา + ลบบัญชีแบบมีเงื่อนไข", "ไทย/English สลับได้ทันที · ลบบัญชีเองได้ผ่านกล่องยืนยันเตือน — หากยังมีบัตรที่ไม่หมดอายุ ระบบจะไม่อนุญาตให้ลบ"],
   ];
   rows.forEach(([title, desc], i) => {
     const y = 1.5 + i * 0.92;
@@ -196,8 +196,11 @@ const headerBar = (slide, title) => {
     s.addText(desc, { x: 3.7, y, w: 8.3, h: 0.65, valign: "middle", fontFace: FONT, fontSize: 14, color: INK });
   });
 
-  s.addText("จองหลายที่นั่ง = ได้บัตรครบทุกที่นั่ง แต่ละบัตรมีรหัสเฉพาะตัวพร้อม QR สำหรับสแกนเข้างาน", {
-    x: 1.2, y: 6.8, w: 10.9, h: 0.5, align: "center", fontFace: FONT, fontSize: 13, bold: true, color: NAVY2,
+  s.addText("บัตรใบเดียวรวมรหัสตั๋วทุกที่นั่ง เรียงแนวนอน เช่น THAST08T5K(08) THAST09N3R(09) — วงเล็บเลขที่นั่งเมื่อซื้อหลายใบ", {
+    x: 1.2, y: 6.55, w: 10.9, h: 0.45, align: "center", fontFace: FONT, fontSize: 13, bold: true, color: NAVY2,
+  });
+  s.addText("QR สแกนเข้างานมีรหัสบัตรครบทุกใน (คั่นช่องว่าง) ไม่ใช่แค่รหัสแรก — พร้อมปุ่มพิมพ์ใบเสร็จรับเงินแยก VAT 7%", {
+    x: 1.2, y: 7.0, w: 10.9, h: 0.4, align: "center", fontFace: FONT, fontSize: 12, color: MUTED,
   });
 }
 
@@ -224,16 +227,97 @@ const headerBar = (slide, title) => {
   });
 }
 
+/* ─── Slide 7.1: ระบบล็อกอินแอดมิน ─── */
+{
+  const s = pptx.addSlide();
+  s.background = { color: "0F172A" };
+  s.addShape("rect", { x: 0, y: 0, w: W, h: 0.16, fill: { color: "6D28D9" } });
+  s.addText("ระบบล็อกอินแอดมิน — แยกจากผู้ใช้สมบูรณ์", {
+    x: 0.55, y: 0.4, w: W - 1.1, h: 0.7, fontFace: FONT, fontSize: 28, bold: true, color: WHITE,
+  });
+  s.addText("อีเมลกลาง admin@concerthub.dev + รหัสผ่านส่วนตัวของแอดมินแต่ละคน — ใครล็อกอินล่าสุดคือคนอยู่เวร", {
+    x: 0.55, y: 1.15, w: W - 1.1, h: 0.5, fontFace: FONT, fontSize: 14, color: "B8CBDE",
+  });
+  // แผงซ้าย: ผู้ใช้
+  s.addShape("roundRect", { x: 0.55, y: 1.9, w: 5.9, h: 4.1, fill: { color: WHITE }, line: { color: NAVY2, width: 2 }, rectRadius: 0.1 });
+  s.addText("🌐 หน้าเว็บผู้ใช้ — /login", { x: 0.85, y: 2.15, w: 5.3, h: 0.5, fontFace: FONT, fontSize: 18, bold: true, color: NAVY2 });
+  s.addText([
+    { text: "สำหรับบัญชี USER เท่านั้น — จองบัตร ดูตั๋ว ชำระเงิน", options: { bullet: true, breakLine: true } },
+    { text: "ใส่บัญชีแอดมิน → โดนปฏิเสธทันที 403 พร้อมข้อความชี้ทางไป /admin/login", options: { bullet: true, breakLine: true } },
+    { text: "Navbar แสดงเมนูผู้ใช้อย่างเดียว", options: { bullet: true } },
+  ], { x: 0.85, y: 2.8, w: 5.3, h: 2.9, fontFace: FONT, fontSize: 13.5, color: INK, lineSpacingMultiple: 1.35 });
+  // แผงขวา: แอดมิน
+  s.addShape("roundRect", { x: 6.9, y: 1.9, w: 5.9, h: 4.1, fill: { color: "1E293B" }, line: { color: "6D28D9", width: 2 }, rectRadius: 0.1 });
+  s.addText("🛡️ หลังบ้าน — /admin/login", { x: 7.2, y: 2.15, w: 5.3, h: 0.5, fontFace: FONT, fontSize: 18, bold: true, color: "C4B5FD" });
+  s.addText([
+    { text: "อีเมลกลางของทีม: admin@concerthub.dev (กรอกไว้ให้แล้ว)", options: { bullet: true, breakLine: true } },
+    { text: "ระบุตัวตนด้วยรหัสผ่านส่วนตัวของแต่ละคน — ห้ามตั้งรหัสซ้ำกัน", options: { bullet: true, breakLine: true } },
+    { text: "ใส่บัญชี USER → โดนปฏิเสธ 403 พร้อมข้อความชี้ทางไป /login", options: { bullet: true, breakLine: true } },
+    { text: "ล็อกอินสำเร็จ = เริ่มเวรทันทีอัตโนมัติ", options: { bullet: true, breakLine: true } },
+    { text: "ตรวจรหัสผ่านก่อนเช็ค role ทั้งสองหน้า — กันการเดาว่าใครเป็นแอดมิน", options: { bullet: true } },
+  ], { x: 7.2, y: 2.8, w: 5.3, h: 3.1, fontFace: FONT, fontSize: 13.5, color: "E8EEF6", lineSpacingMultiple: 1.3 });
+  s.addText("ทุก API หลังบ้านตรวจ JWT + authorize(\"ADMIN\") ทุกครั้ง — โทเคนของ USER เรียก API หลังบ้านไม่ได้", {
+    x: 0.55, y: 6.35, w: W - 1.1, h: 0.5, align: "center", fontFace: FONT, fontSize: 13, italic: true, color: "94A3B8",
+  });
+}
+
+/* ─── Slide 7.2: เวรประจำวัน + บันทึกผู้ตรวจ ─── */
+{
+  const s = pptx.addSlide();
+  headerBar(s, "ระบบเวรประจำวัน + บันทึกรหัสผู้ตรวจสลิป");
+  // ซ้าย: เวร
+  s.addShape("roundRect", { x: 0.55, y: 1.55, w: 5.9, h: 4.6, fill: { color: WHITE }, line: { color: "E2E8F0" }, rectRadius: 0.1 });
+  s.addText("🗓️ เวรประจำวัน (ตาราง StaffDuty)", { x: 0.85, y: 1.8, w: 5.3, h: 0.5, fontFace: FONT, fontSize: 17, bold: true, color: NAVY2 });
+  s.addText([
+    { text: "ล็อกอินหลังบ้าน = เริ่มเวรทันทีอัตโนมัติ (ปิดเวรค้างให้เอง)", options: { bullet: true, breakLine: true } },
+    { text: "แถบ \"ใช้งานในชื่อ ชื่อ-นามสกุล (รหัส)\" แสดงบนหน้าตรวจสลิปตลอดขณะทำงาน", options: { bullet: true, breakLine: true } },
+    { text: "ปุ่ม \"เปลี่ยนผู้ทำงาน\" สลับเวรกลางคันได้", options: { bullet: true, breakLine: true } },
+    { text: "เวรเปิดอยู่ = แถวที่ endedAt เป็น null — มีได้ครั้งละ 1 เสมอ (transaction)", options: { bullet: true } },
+  ], { x: 0.85, y: 2.45, w: 5.3, h: 3.5, fontFace: FONT, fontSize: 13, color: INK, lineSpacingMultiple: 1.35 });
+  // ขวา: ผู้ตรวจ
+  s.addShape("roundRect", { x: 6.9, y: 1.55, w: 5.9, h: 4.6, fill: { color: WHITE }, line: { color: "E2E8F0" }, rectRadius: 0.1 });
+  s.addText("✅ บันทึกรหัสผู้ตรวจสลิป", { x: 7.2, y: 1.8, w: 5.3, h: 0.5, fontFace: FONT, fontSize: 17, bold: true, color: NAVY2 });
+  s.addText([
+    { text: "กดอนุมัติ/ปฏิเสธ → บันทึกรหัสแอดมินคนกดลงฐานข้อมูล (reviewedBy)", options: { bullet: true, breakLine: true } },
+    { text: "รายการ \"อนุมัติแล้ว\" แสดง อนุมัติโดย รหัส admin0002 (ชื่อ) + เวลา", options: { bullet: true, breakLine: true } },
+    { text: "แอดมินทุกคนเห็นได้ว่าใครตรวจการจองลูกค้ารายไหน", options: { bullet: true, breakLine: true } },
+    { text: "ข้อความยืนยันหลังกด ก็ระบุผู้ตรวจ เช่น \"ผู้ตรวจ: แอดมินรหัส 0002\"", options: { bullet: true } },
+  ], { x: 7.2, y: 2.45, w: 5.3, h: 3.5, fontFace: FONT, fontSize: 13, color: INK, lineSpacingMultiple: 1.35 });
+  s.addText("ลบบัญชีแอดมินแล้วประวัติเวรถูกจัดการอัตโนมัติ (Cascade) — ไม่ทำให้ฐานข้อมูลพัง", {
+    x: 0.55, y: 6.5, w: W - 1.1, h: 0.45, align: "center", fontFace: FONT, fontSize: 12.5, italic: true, color: MUTED,
+  });
+}
+
+/* ─── Slide 7.3: จัดการแอดมิน ─── */
+{
+  const s = pptx.addSlide();
+  headerBar(s, "เพิ่ม / ลดแอดมิน — ยืนยันด้วยรหัสลับทุกครั้ง");
+  const rows = [
+    ["🔒 รหัสลับ 8 ตัวก่อนเข้าเมนู", "กด \"เพิ่มแอดมิน\" ต้องใส่รหัสยืนยัน (Main0110) ใหม่ทุกครั้ง — ใส่ผิดไม่เห็นข้อมูลใดเลย และ server ตรวจรหัสทุกคำสั่งเพิ่ม/ลด"],
+    ["🆔 รหัสพนักงาน 4 หลัก (ตัวเลข)", "ระบบสร้างอีเมลอัตโนมัติ admin + รหัส @concerthub.dev เช่น 0001 → admin0001@concerthub.dev — กรองให้พิมพ์ได้แค่ตัวเลข 4 ตัว"],
+    ["➕ เพิ่มแอดมินใหม่", "กรอกชื่อ · เบอร์ · วันเกิด · รหัสพนักงาน · รหัสผ่านส่วนตัว — บัญชีใหม่ล็อกอินเข้าหลังบ้านได้ทันที"],
+    ["➖ ลดแอดมิน", "รายชื่อแอดมินทั้งหมดพร้อมปุ่มลบ — ยืนยันผ่านกล่องเตือนก่อนลบถาวร · ลบบัญชีตัวเองไม่ได้"],
+    ["🚫 กันรหัสผ่านซ้ำ", "ล็อกอินใช้อีเมลกลางคนเดียว รหัสผ่านจึงต้องไม่ซ้ำ — ตรวจตอนสร้างบัญชี และตรวจซ้ำอีกชั้นตอนล็อกอิน (409)"],
+  ];
+  rows.forEach(([title, desc], i) => {
+    const y = 1.5 + i * 1.0;
+    s.addShape("roundRect", { x: 0.55, y, w: W - 1.1, h: 0.85, fill: { color: i % 2 ? "F8FAFC" : SOFT }, rectRadius: 0.06 });
+    s.addText(title, { x: 0.85, y: y + 0.1, w: 3.9, h: 0.65, fontFace: FONT, fontSize: 14.5, bold: true, color: NAVY2, valign: "middle" });
+    s.addText(desc, { x: 4.9, y: y + 0.1, w: W - 5.5, h: 0.65, fontFace: FONT, fontSize: 12.5, color: INK, valign: "middle" });
+  });
+}
+
 /* ─── Slide 8: ฟีเจอร์แอดมิน ─── */
 {
   const s = pptx.addSlide();
   headerBar(s, "ฟีเจอร์สำหรับแอดมิน");
   const rows = [
-    ["สถิติรายคอนเสิร์ต", "เลือกคอน (แยกหมวดเปิดขาย/ปิดขาย) → รายได้รวม รายได้รายโซน สถานะบัตรทั้งหมด + ตารางรายโซน"],
-    ["จัดการคอนเสิร์ต (เรียลไทม์)", "ผังโซนวงแหวน + สถานะทุกที่นั่ง ว่าง/รอตรวจสอบ/ยืนยันแล้ว — รีเฟรชอัตโนมัติทุก 10 วินาที"],
-    ["รายการตรวจสอบสลิป", "ดูสลิป อนุมัติ/ปฏิเสธพร้อมเหตุผล — บันทึกชื่อแอดมินผู้ตรวจทุกรายการ"],
-    ["Export PDF + CSV", "ส่งออกรายงานสถิติและรายการจองเป็นเอกสาร (PDF แบ่งหน้าอัตโนมัติ / CSV UTF-8 เปิดใน Excel)"],
-    ["สร้าง + แก้ไขคอนเสิร์ต", "ปกคอนเซปต์ (16:9) · ชื่อ 2 ภาษา · วันสุดท้ายขาย (ปิดอัตโนมัติ) · ปุ่มยกเลิกการขายกลางคัน · ลบแบบร่าง"],
+    ["1 · การจองทั้งหมด", "ดูการจองของลูกค้าทุกรายการ กรองตามสถานะ พร้อมรหัสตั๋วรายที่นั่ง"],
+    ["2 · ตรวจสอบสลิป", "ดูสลิป อนุมัติ/ปฏิเสธพร้อมเหตุผล — บันทึกรหัสแอดมินผู้ตรวจและแสดงในรายการอนุมัติแล้วให้ทุกคนเห็น + แถบ \"ใช้งานในชื่อ\""],
+    ["3 · สถิติและข้อมูล", "รายได้รวม รายได้รายโซน สถานะบัตรทั้งหมด + Export PDF / CSV"],
+    ["4 · แบบร่าง", "คอนที่ยังไม่เปิดขาย — แก้ไข เปิดขาย หรือลบทิ้ง"],
+    ["5 · สร้างคอนเสิร์ต", "ปกคอนเซปต์ (16:9) · ชื่อ 2 ภาษา · หลายวันแสดง · ตั้งราคา/เปิดขายรายโซน · วันสุดท้ายขายปิดอัตโนมัติ"],
+    ["6 · เพิ่มแอดมิน", "พื้นที่จำกัดสิทธิ์ — ต้องใส่รหัสลับ 8 ตัวทุกครั้งก่อนเพิ่ม/ลดแอดมิน"],
   ];
   rows.forEach(([title, desc], i) => {
     const y = 1.5 + i * 1.0;
@@ -248,22 +332,50 @@ const headerBar = (slide, title) => {
   const s = pptx.addSlide();
   headerBar(s, "โครงสร้างฐานข้อมูล (Prisma + PostgreSQL)");
   const models = [
-    ["User", "บัญชี + ข้อมูลยืนยันตัวตน (ชื่อ / เบอร์ / เลขบัตร / เลขหลังบัตร)", NAVY2],
+    ["User", "บัญชี + ยืนยันตัวตน + employeeId (รหัสพนักงาน — unique) — เมล/เบอร์/บัตรบังคับ unique ทุกฟิลด์", NAVY2],
     ["Concert", "คอนเสิร์ต + ชื่อ 2 ภาษา + ปก + saleEndDate (ปิดขายอัตโนมัติ)", "1E6A41"],
     ["Venue + VenueZone", "ผังโซน FIX ประจำสถานที่ — ทุกสถานที่ใช้ผังมาตรฐานเดียวกัน", "9A4B2F"],
     ["Zone + Seat", "โซนขายบัตรรายคอน + ที่นั่งรายตัว (isAvailable อัปเดตแบบ transaction)", "7C3AED"],
     ["Booking + BookingSeat", "การจองถือที่นั่ง + รหัสตั๋วรายที่นั่ง (10 ตัว) แบบ SERIALIZABLE", "B45309"],
-    ["Payment", "สลิป + สถานะ + ผู้ตรวจ (reviewedBy) + เวลาตรวจ", "BE185D"],
+    ["Payment", "สลิป + สถานะ + ผู้ตรวจพร้อมรหัสพนักงาน (reviewedBy) + เวลาตรวจ", "BE185D"],
+    ["StaffDuty (ใหม่)", "เวรประจำวันของแอดมิน — ใครอยู่เวร เวลาเริ่ม/เลิก (endedAt = null คือกำลังทำงาน)", "6D28D9"],
     ["Notification", "แจ้งเตือนบัตรหมดรายโซน/ทั้งคอน อัตโนมัติ", "0E7490"],
   ];
   models.forEach(([name, desc, color], i) => {
-    const y = 1.5 + i * 0.82;
-    s.addShape("roundRect", { x: 0.55, y, w: 4.1, h: 0.68, fill: { color: NAVY }, rectRadius: 0.06 });
-    s.addText(name, { x: 0.85, y, w: 3.7, h: 0.68, valign: "middle", fontFace: "Consolas", fontSize: 15, bold: true, color: WHITE });
-    s.addText(desc, { x: 4.95, y, w: W - 5.5, h: 0.68, valign: "middle", fontFace: FONT, fontSize: 12.5, color: INK });
+    const y = 1.45 + i * 0.7;
+    s.addShape("roundRect", { x: 0.55, y, w: 4.1, h: 0.6, fill: { color: NAVY }, rectRadius: 0.06 });
+    s.addText(name, { x: 0.85, y, w: 3.7, h: 0.6, valign: "middle", fontFace: "Consolas", fontSize: 14, bold: true, color: WHITE });
+    s.addText(desc, { x: 4.95, y, w: W - 5.5, h: 0.6, valign: "middle", fontFace: FONT, fontSize: 12, color: INK });
   });
   s.addText("ความสัมพันธ์ทั้งหมดกำหนด onDelete: Cascade — ลบคอน/ลบบัญชี แล้วข้อมูลลูกถูกจัดการตามอัตโนมัติ", {
-    x: 0.55, y: 7.0, w: W - 1.1, h: 0.4, fontFace: FONT, fontSize: 12, italic: true, color: MUTED,
+    x: 0.55, y: 7.05, w: W - 1.1, h: 0.4, fontFace: FONT, fontSize: 12, italic: true, color: MUTED,
+  });
+}
+
+/* ─── Slide: ข้อมูลเดโม่ ─── */
+{
+  const s = pptx.addSlide();
+  headerBar(s, "ข้อมูลตัวอย่างในระบบ (Seed)");
+  const cards = [
+    ["🎤 คอนเสิร์ต 7 งาน", "ครบทุกประเภท THAI/INTL × SOLO/GROUP — ร็อค · EDM · แจ๊ส · K-POP · เปียโน · อินดี้ · ซิมโฟนี พร้อมกรณี OPEN 5 / DRAFT 1 / SOLD_OUT 1"],
+    ["👥 บัญชีครบ", "แอดมิน 5 คน (อีเมลกลาง + รหัสผ่านส่วนตัวไม่ซ้ำกัน) · ลูกค้า 5 คน — โปรไฟล์ครบเบอร์/เลขบัตรไม่ซ้ำกัน"],
+    ["🎟️ การจอง 6 กรณีศึกษา", "อนุมัติแล้ว · รอตรวจสลิป · ไม่อนุมัติ (พร้อมเหตุผล) · รอชำระเงิน · ยกเลิกแล้ว · บัตรหมดยกโหล — พร้อมรหัสตั๋วรายที่นั่งจริง"],
+  ];
+  cards.forEach(([title, desc], i) => {
+    const x = 0.55 + i * 4.25;
+    s.addShape("roundRect", { x, y: 1.5, w: 3.95, h: 2.9, fill: { color: WHITE }, line: { color: "E2E8F0" }, rectRadius: 0.1 });
+    s.addText(title, { x: x + 0.25, y: 1.75, w: 3.45, h: 0.5, fontFace: FONT, fontSize: 17, bold: true, color: NAVY2 });
+    s.addText(desc, { x: x + 0.25, y: 2.3, w: 3.45, h: 2.0, fontFace: FONT, fontSize: 12.5, color: INK, lineSpacingMultiple: 1.2 });
+  });
+  s.addShape("roundRect", { x: 0.55, y: 4.7, w: 5.9, h: 2.0, fill: { color: SOFT }, rectRadius: 0.1 });
+  s.addText("🔑 บัญชีทดลองหลังบ้าน", { x: 0.85, y: 4.9, w: 5.3, h: 0.45, fontFace: FONT, fontSize: 15, bold: true, color: NAVY2 });
+  s.addText("อีเมลกลาง admin@concerthub.dev + รหัสผ่านส่วนตัว:\nAdmin1234 (0000) · Admin0001 (0001) · Staff1234 (0002) · Admin0003 (0003)", {
+    x: 0.85, y: 5.4, w: 5.3, h: 1.1, fontFace: FONT, fontSize: 12.5, color: INK, lineSpacingMultiple: 1.3,
+  });
+  s.addShape("roundRect", { x: 6.9, y: 4.7, w: 5.9, h: 2.0, fill: { color: SOFT }, rectRadius: 0.1 });
+  s.addText("🔑 บัญชีทดลองผู้ใช้", { x: 7.2, y: 4.9, w: 5.3, h: 0.45, fontFace: FONT, fontSize: 15, bold: true, color: NAVY2 });
+  s.addText("user@concerthub.dev · somchai@example.com\nmalee@example.com · prakan@example.com · nok@example.com\nรหัสผ่านทุกบัญชี: User1234", {
+    x: 7.2, y: 5.4, w: 5.3, h: 1.1, fontFace: FONT, fontSize: 12.5, color: INK, lineSpacingMultiple: 1.3,
   });
 }
 
@@ -274,16 +386,18 @@ const headerBar = (slide, title) => {
   const items = [
     ["JWT + bcrypt", "ทุก API ผู้ใช้/แอดมินต้องพิสูจน์ตัวตน — รหัสผ่านเข้ารหัส bcrypt 12 rounds"],
     ["Transaction SERIALIZABLE", "การจองที่นั่งรันใน transaction ระดับ SERIALIZABLE + retry — สองคนจองที่นั่งเดียวพร้อมกันไม่ได้"],
+    ["ข้อมูลตัวตนใช้ซ้ำไม่ได้", "อีเมล · เบอร์โทร · เลขบัตรหน้า-หลัง · รหัสพนักงาน — บังคับ Unique ระดับฐานข้อมูล สมัครซ้ำไม่ได้แม้พร้อมกัน"],
+    ["กันลบบัญชีเมื่อมีบัตรค้าง", "ยังมีบัตรที่ไม่หมดอายุ → ระบบปฏิเสธการลบพร้อมบอกจำนวน — ต้องใช้บัตรหรือยกเลิกจองก่อน (ยืนยันผ่านกล่องเตือน)"],
+    ["รหัสลับตรวจที่ server", "เพิ่ม/ลดแอดมินต้องส่งรหัสยืนยัน 8 ตัว (Main0110) ทุกคำสั่ง — ข้ามหน้าเว็บยิง API ตรงก็โดนปฏิเสธ"],
+    ["ห้ามรหัสผ่านแอดมินซ้ำ", "ล็อกอินใช้อีเมลกลางคนเดียว รหัสผ่านจึงระบุตัวตน — ตรวจซ้ำตอนสร้างบัญชีและตอนล็อกอิน"],
+    ["แยกบทบาททุกด่าน", "USER / ADMIN — แอดมินล็อกอินหน้าผู้ใช้ไม่ได้ (403) และ USER เรียก API หลังบ้านไม่ได้"],
     ["ตรวจเลขบัตร checksum", "เลขบัตร 13 หลักตรวจตามมาตรฐานกรมการปกครอง ทั้งฝั่ง client และ server"],
-    ["ตรวจข้อมูลสองชั้น", "Zod validate ทั้ง frontend (ก่อนส่ง) และ backend (ก่อนบันทึก) — สอดคล้องกัน"],
-    ["สิทธิ์แยกบทบาท", "USER / ADMIN — จองบัตรเฉพาะผู้ใช้ทั่วไป แอดมินจัดการหลังบ้าน (ลบคอนได้เฉพาะแบบร่าง)"],
-    ["Auto-close + บังคับชั้นจอง", "หมดวันขายระบบปิดทันทีทั้งจาก background job และตอนกดจอง"],
   ];
   items.forEach(([title, desc], i) => {
-    const y = 1.5 + i * 0.92;
-    s.addShape("roundRect", { x: 0.55, y, w: W - 1.1, h: 0.8, fill: { color: i % 2 ? "F8FAFC" : SOFT }, rectRadius: 0.06 });
-    s.addText(title, { x: 0.85, y: y + 0.08, w: 3.7, h: 0.6, fontFace: FONT, fontSize: 14.5, bold: true, color: NAVY2, valign: "middle" });
-    s.addText(desc, { x: 4.7, y: y + 0.08, w: W - 5.3, h: 0.6, fontFace: FONT, fontSize: 12.5, color: INK, valign: "middle" });
+    const y = 1.45 + i * 0.72;
+    s.addShape("roundRect", { x: 0.55, y, w: W - 1.1, h: 0.62, fill: { color: i % 2 ? "F8FAFC" : SOFT }, rectRadius: 0.06 });
+    s.addText(title, { x: 0.85, y: y + 0.05, w: 3.7, h: 0.52, fontFace: FONT, fontSize: 13.5, bold: true, color: NAVY2, valign: "middle" });
+    s.addText(desc, { x: 4.7, y: y + 0.05, w: W - 5.3, h: 0.52, fontFace: FONT, fontSize: 11.5, color: INK, valign: "middle" });
   });
 }
 
@@ -294,11 +408,12 @@ const headerBar = (slide, title) => {
   s.addShape("rect", { x: 0, y: 0, w: W, h: 0.22, fill: { color: GOLD } });
   s.addText("สรุป", { x: 0.6, y: 0.7, w: W - 1.2, h: 0.9, fontFace: FONT, fontSize: 40, bold: true, color: WHITE });
   const points = [
-    "ระบบจองตั๋วคอนเสิร์ตครบวงจร ตั้งแต่เลือกที่นั่งจนได้บัตร QR เข้างาน",
-    "ผังโซนมาตรฐานสากล (Standing · VIP · Platinum · Gold · Silver · Balcony) เหมือนกันทุกสถานที่",
-    "ปิดขายอัตโนมัติตามวันสุดท้าย + ยกเลิกการขายกลางคันได้ + ลบแบบร่างได้",
-    "สถิติรายคอน 3 มุมมอง พร้อมส่งออกรายงาน PDF และ CSV",
-    "รองรับสองภาษา ไทย/English และผู้ใช้ลบบัญชีตัวเองได้",
+    "ระบบจองตั๋วคอนเสิร์ตครบวงจร ตั้งแต่เลือกที่นั่งจนได้บัตร QR เข้างาน + พิมพ์ใบเสร็จแยก VAT 7%",
+    "บัตรใบเดียวรวมรหัสตั๋วทุกที่นั่ง (มีเลขที่นั่งกำกับ) · QR สแกนแล้วได้รหัสครบทุกใน",
+    "หลังบ้านแยกระบบล็อกอิน — อีเมลกลาง + รหัสผ่านส่วนตัว ระบุตัวตนแอดมินแต่ละคน",
+    "ระบบเวรประจำวันอัตโนมัติ + บันทึกรหัสผู้ตรวจสลิปทุกรายการ แอดมินทุกคนตรวจย้อนหลังได้",
+    "เพิ่ม/ลดแอดมินได้เองภายใต้รหัสลับ 8 ตัว — ตรวจที่ server ทุกครั้ง",
+    "ข้อมูลตัวตนไม่ซ้ำ (Unique ระดับ DB) · กันลบบัญชีเมื่อมีบัตรไม่หมดอายุ · สองภาษา ไทย/EN",
   ];
   points.forEach((p, i) => {
     s.addShape("ellipse", { x: 1.0, y: 2.0 + i * 0.72 + 0.12, w: 0.16, h: 0.16, fill: { color: GOLD } });

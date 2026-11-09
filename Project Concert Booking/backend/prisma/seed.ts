@@ -72,7 +72,8 @@ const SEED_VENUES: Array<{
     zones: STANDARD_ZONES,
   },
 ];
-];
+
+type SaleStatus = "OPEN" | "DRAFT" | "SOLD_OUT";
 
 const SEED_CONCERTS: Array<{
   name: string;
@@ -87,6 +88,8 @@ const SEED_CONCERTS: Array<{
   imageUrl: string;
   /** รหัสโซนที่ "ไม่เปิดขาย" สำหรับคอนเสิร์ตนี้ (แสดงเป็นสีเทาบนผัง) */
   offSaleCodes: string[];
+  /** สถานะการขาย — ปกติ OPEN, มี DRAFT (แบบร่าง) และ SOLD_OUT (บัตรหมด) ให้เห็นกรณีศึกษา */
+  saleStatus?: SaleStatus;
 }> = [
   {
     name: "คอนเสิร์ตตำนานร็อค 2026",
@@ -175,39 +178,108 @@ const SEED_CONCERTS: Array<{
     emoji: "🌅",
     imageUrl: "/uploads/covers/cover-indie.svg",
     offSaleCodes: [],
+    saleStatus: "DRAFT", // กรณีศึกษา: แบบร่าง — ยังไม่เปิดขาย ผู้ใช้ทั่วไปมองไม่เห็น
+  },
+  {
+    name: "ซิมโฟนีออฟไฟร์เวิร์คส์ — บัตรหมดยกโหล",
+    nameEn: "Symphony of Fireworks — Sold Out",
+    description:
+      "คอนเสิร์ตสมเกียรติบรรเลงสดประกอบดนตรีพลุ บัตรขายหมดภายใน 10 นาที — ใช้เป็นกรณีศึกษา 'บัตรหมด' (SOLD_OUT) บนผังทุกโซน",
+    dates: [new Date("2027-04-10T18:00:00.000Z")],
+    venueName: "รามอินทรา สเตเดียม กรุงเทพฯ",
+    priceMultiplier: 1.0,
+    origin: "INTERNATIONAL",
+    artistType: "SOLO",
+    emoji: "🎆",
+    imageUrl: "/uploads/covers/cover-symphony.svg",
+    offSaleCodes: [],
+    saleStatus: "SOLD_OUT", // กรณีศึกษา: บัตรหมดทุกโซน
   },
 ];
 
 const roundTo100 = (value: number): number => Math.round(value / 100) * 100;
 
+/* ─── บัญชีแอดมินเดโม่ ────────────────────────────────────────────────────
+ * ล็อกอินหลังบ้านด้วย "อีเมลกลาง admin@concerthub.dev + รหัสผ่านส่วนตัวของแต่ละคน"
+ * รหัสผ่านของแอดมินแต่ละคน "ห้ามซ้ำกัน" ระบบจึงระบุตัวตนได้
+ */
+const DEMO_ADMINS = [
+  { email: "admin@concerthub.dev", password: "Admin1234", employeeId: "0000", firstName: "อภิชาติ", lastName: "ดูแลระบบ", phone: "0299900001", dob: "1985-03-15" },
+  { email: "admin0001@concerthub.dev", password: "Admin0001", employeeId: "0001", firstName: "สมชาย", lastName: "ตรวจบัตร", phone: "0299900002", dob: "1992-07-20" },
+  { email: "admin0002@concerthub.dev", password: "Staff1234", employeeId: "0002", firstName: "สมหญิง", lastName: "ตรวจงาน", phone: "0299900003", dob: "1995-11-02" },
+  { email: "admin0003@concerthub.dev", password: "Admin0003", employeeId: "0003", firstName: "มาลี", lastName: "จัดการคอน", phone: "0299900004", dob: "1993-02-14" },
+];
+
+/* ─── บัญชีลูกค้าเดโม่ (รหัสผ่านใช้ซ้ำกันได้ — เฉพาะแอดมินที่ห้ามซ้ำ) ─── */
+const DEMO_USERS = [
+  { email: "user@concerthub.dev", password: "User1234", firstName: "ผู้ใช้", lastName: "ทดลอง", phone: "0899990001", nationalId: "1100100000001", nationalIdBack: "JT000000001", dob: "2000-05-10" },
+  { email: "somchai@example.com", password: "User1234", firstName: "สมชาย", lastName: "ใจดี", phone: "0812345001", nationalId: "1100200000002", nationalIdBack: "JT000000002", dob: "1998-03-22" },
+  { email: "malee@example.com", password: "User1234", firstName: "มาลี", lastName: "รักคอน", phone: "0812345002", nationalId: "1100300000003", nationalIdBack: "JT000000003", dob: "2001-09-30" },
+  { email: "prakan@example.com", password: "User1234", firstName: "ประกาย", lastName: "ฟ้าใส", phone: "0812345003", nationalId: "1100400000004", nationalIdBack: "JT000000004", dob: "1997-12-05" },
+  { email: "nok@example.com", password: "User1234", firstName: "นก", lastName: "สีฟ้า", phone: "0812345004", nationalId: "1100500000005", nationalIdBack: "JT000000005", dob: "2002-06-18" },
+];
+
 async function main(): Promise<void> {
   console.log("🌱 กำลัง seed ฐานข้อมูล...");
 
-  // --- บัญชีทดลอง -------------------------------------------------------
+  // --- บัญชีแอดมินเดโม่ (ล็อกอินด้วยอีเมลกลาง + รหัสผ่านส่วนตัว) ------------
   const adminPassword = await bcrypt.hash("Admin1234", 12);
+  for (const admin of DEMO_ADMINS) {
+    const hashed = admin.email === "admin@concerthub.dev" ? adminPassword : await bcrypt.hash(admin.password, 12);
+    await prisma.user.upsert({
+      where: { email: admin.email },
+      // update: ไม่แตะรหัสผ่าน (ถ้าบัญชีมีอยู่แล้ว) — เติมข้อมูลประวัติให้ครบ
+      update: {
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        employeeId: admin.employeeId,
+        phone: admin.phone,
+        dateOfBirth: new Date(admin.dob),
+      },
+      create: {
+        email: admin.email,
+        password: hashed,
+        role: "ADMIN",
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        employeeId: admin.employeeId,
+        phone: admin.phone,
+        dateOfBirth: new Date(admin.dob),
+      },
+    });
+  }
+  console.log("✅ แอดมิน 4 คน (ล็อกอินด้วยอีเมลกลาง admin@concerthub.dev + รหัสผ่านส่วนตัว):");
+  for (const admin of DEMO_ADMINS) {
+    console.log(`   - รหัส ${admin.employeeId} ${admin.firstName} ${admin.lastName} → ${admin.password}`);
+  }
+
+  // --- บัญชีลูกค้าเดโม่ ------------------------------------------------------
   const userPassword = await bcrypt.hash("User1234", 12);
-
-  await prisma.user.upsert({
-    where: { email: "admin@concerthub.dev" },
-    update: {},
-    create: {
-      email: "admin@concerthub.dev",
-      password: adminPassword,
-      role: "ADMIN",
-    },
-  });
-  console.log("✅ บัญชีแอดมินพร้อมใช้งาน: admin@concerthub.dev / Admin1234");
-
-  await prisma.user.upsert({
-    where: { email: "user@concerthub.dev" },
-    update: {},
-    create: {
-      email: "user@concerthub.dev",
-      password: userPassword,
-      role: "USER",
-    },
-  });
-  console.log("✅ บัญชีผู้ใช้พร้อมใช้งาน: user@concerthub.dev / User1234");
+  for (const user of DEMO_USERS) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        nationalId: user.nationalId,
+        nationalIdBack: user.nationalIdBack,
+        dateOfBirth: new Date(user.dob),
+      },
+      create: {
+        email: user.email,
+        password: userPassword,
+        role: "USER",
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        nationalId: user.nationalId,
+        nationalIdBack: user.nationalIdBack,
+        dateOfBirth: new Date(user.dob),
+      },
+    });
+  }
+  console.log(`✅ ลูกค้าเดโม่ ${DEMO_USERS.length} คน (รหัสผ่านทุกคน: User1234)`);
 
   // --- สถานที่จัดงาน (ผังโซน FIX ประจำสถานที่) -----------------------------
   const venueCount = await prisma.venue.count();
@@ -264,8 +336,8 @@ async function main(): Promise<void> {
           artistType: concert.artistType,
           emoji: concert.emoji,
           imageUrl: concert.imageUrl,
-          // คอนเสิร์ตตัวอย่างเปิดขายทันที (คอนที่สร้างใหม่ผ่าน API จะเป็น DRAFT เสมอ)
-          saleStatus: "OPEN",
+          // OPEN = เปิดขาย · DRAFT = แบบร่าง · SOLD_OUT = บัตรหมด (กรณีศึกษา)
+          saleStatus: concert.saleStatus ?? "OPEN",
           zones: {
             create: venue.zones.map((venueZone) => {
               const totalSeats = venueZone.rowCount * venueZone.seatsPerRow;
@@ -291,8 +363,185 @@ async function main(): Promise<void> {
       });
     }
     console.log(
-      `✅ สร้างคอนเสิร์ต ${SEED_CONCERTS.length} งาน (โซนมาจากผังสถานที่ + ที่นั่งรายที่นั่ง)`,
+      `✅ สร้างคอนเสิร์ต ${SEED_CONCERTS.length} งาน (THAI/INTL × SOLO/GROUP ครบ + OPEN/DRAFT/SOLD_OUT)`,
     );
+
+    // --- การจองสาธิต: กรณีศึกษาครบ (อนุมัติ / รอตรวจ / ไม่อนุมัติ / รอชำระ / ยกเลิก / บัตรหมด) ---
+    const userIdOf = async (email: string): Promise<string> => {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) throw new Error(`ไม่พบผู้ใช้ ${email}`);
+      return user.id;
+    };
+
+    const somchaiId = await userIdOf("somchai@example.com");
+    const maleeId = await userIdOf("malee@example.com");
+    const prakanId = await userIdOf("prakan@example.com");
+    const nokId = await userIdOf("nok@example.com");
+    const reviewerId = await userIdOf("admin0001@concerthub.dev");
+
+    const concertByName = async (name: string) => {
+      const found = await prisma.concert.findFirst({ where: { name } });
+      if (!found) throw new Error(`ไม่พบคอนเสิร์ต "${name}"`);
+      return found;
+    };
+
+    const rock = await concertByName("คอนเสิร์ตตำนานร็อค 2026");
+    const edm = await concertByName("เทศกาล EDM — NEON PULSE");
+    const jazz = await concertByName("คอนเสิร์ตเดี่ยว แจ๊สใต้แสงดาว");
+    const kpop = await concertByName("คอนเสิร์ต K-POP WAVE");
+    const soldOut = await concertByName("ซิมโฟนีออฟไฟร์เวิร์คส์ — บัตรหมดยกโหล");
+
+    /** สร้างการจองสาธิต: เลือกที่นั่งว่างในโซน → จอง + รหัสตั๋วรายที่นั่ง + ปรับที่นั่งคงเหลือ */
+    const createDemoBooking = async (opts: {
+      userId: string;
+      concert: { id: string; origin: "THAI" | "INTERNATIONAL"; dates: Date[] };
+      zoneCode: string;
+      quantity: number;
+      status: "PENDING" | "PENDING_VERIFICATION" | "COMPLETED" | "REJECTED" | "CANCELLED";
+      reviewerId?: string;
+      note?: string;
+    }): Promise<void> => {
+      const zone = await prisma.zone.findFirst({
+        where: { concertId: opts.concert.id, code: opts.zoneCode },
+      });
+      if (!zone) throw new Error(`ไม่พบโซน ${opts.zoneCode}`);
+      const seats = await prisma.seat.findMany({
+        where: { zoneId: zone.id, isAvailable: true },
+        orderBy: { seatNumber: "asc" },
+        take: opts.quantity,
+      });
+      if (seats.length < opts.quantity) throw new Error(`ที่นั่งโซน ${opts.zoneCode} ไม่พอ`);
+
+      // ถือที่นั่ง + หักจำนวนคงเหลือ (เหมือน flow จองจริง)
+      await prisma.seat.updateMany({
+        where: { id: { in: seats.map((seat) => seat.id) } },
+        data: { isAvailable: false },
+      });
+      await prisma.zone.update({
+        where: { id: zone.id },
+        data: { availableSeats: { decrement: opts.quantity } },
+      });
+
+      // รหัสตั๋วรายที่นั่ง: {THA|NAT} + รหัสโซน + รหัสที่นั่ง (แถว+เลข เช่น A08) + เลข 2 ตัว (10 ตัวอักษร)
+      // ใช้ seat.code ซึ่งไม่ซ้ำกันในโซน (seatNumber เริ่ม 1 ใหม่ทุกแถว ใช้ไม่ได้) — เรียงตามที่นั่งเรียงไว้
+      const prefix = (opts.concert.origin === "THAI" ? "THA" : "NAT") + zone.code;
+      const rand2 = String((Date.now() + seats.length) % 100).padStart(2, "0");
+      const seatTicketCodes = seats.map((seat) => `${prefix}${seat.code}${rand2}`);
+
+      const hasPayment = opts.status !== "PENDING" && opts.status !== "CANCELLED";
+
+      await prisma.booking.create({
+        data: {
+          userId: opts.userId,
+          concertId: opts.concert.id,
+          zoneId: zone.id,
+          showDate: opts.concert.dates[0] ?? new Date("2027-06-01"),
+          ticketCode: seatTicketCodes[0],
+          quantity: opts.quantity,
+          totalPrice: zone.price * opts.quantity,
+          status: opts.status,
+          seats: {
+            create: seats.map((seat, index) => ({
+              seatId: seat.id,
+              ticketCode: seatTicketCodes[index],
+            })),
+          },
+          payment: hasPayment
+            ? {
+                create: {
+                  slipImage: "/uploads/slips/demo-slip.png",
+                  status:
+                    opts.status === "COMPLETED"
+                      ? "APPROVED"
+                      : opts.status === "REJECTED"
+                        ? "REJECTED"
+                        : "PENDING_VERIFICATION",
+                  reviewedAt:
+                    opts.status === "COMPLETED" || opts.status === "REJECTED"
+                      ? new Date()
+                      : null,
+                  reviewedBy: opts.reviewerId ?? null,
+                  note: opts.note ?? null,
+                },
+              }
+            : undefined,
+        },
+      });
+    };
+
+    // 1) อนุมัติแล้ว (COMPLETED + สลิป APPROVED — มีชื่อแอดมินผู้ตรวจ)
+    await createDemoBooking({
+      userId: somchaiId,
+      concert: rock,
+      zoneCode: "VP",
+      quantity: 2,
+      status: "COMPLETED",
+      reviewerId,
+    });
+    console.log("   กรณีศึกษา: อนุมัติแล้ว (สมชาย — ร็อค โซน VIP 2 ที่นั่ง)");
+
+    // 2) รอตรวจสอบสลิป (PENDING_VERIFICATION)
+    await createDemoBooking({
+      userId: maleeId,
+      concert: kpop,
+      zoneCode: "GD",
+      quantity: 1,
+      status: "PENDING_VERIFICATION",
+    });
+    console.log("   กรณีศึกษา: รอตรวจสลิป (มาลี — K-POP โซน Gold C 1 ที่นั่ง)");
+
+    // 3) ไม่อนุมัติ / บัตรเสีย (REJECTED — สลิปไม่ผ่าน พร้อมเหตุผลจากแอดมิน)
+    await createDemoBooking({
+      userId: prakanId,
+      concert: rock,
+      zoneCode: "GD",
+      quantity: 2,
+      status: "REJECTED",
+      reviewerId,
+      note: "สลิปไม่ชัด ยอดโอนไม่ตรงกับยอดที่ต้องชำระ กรุณาแนบสลิปใหม่",
+    });
+    console.log("   กรณีศึกษา: ไม่อนุมัติ/บัตรเสีย (ประกาย — ร็อค โซน Gold C 2 ที่นั่ง พร้อมเหตุผล)");
+
+    // 4) รอชำระเงิน (PENDING — ยังไม่แนบสลิป)
+    await createDemoBooking({
+      userId: somchaiId,
+      concert: edm,
+      zoneCode: "ST",
+      quantity: 1,
+      status: "PENDING",
+    });
+    console.log("   กรณีศึกษา: รอชำระเงิน (สมชาย — EDM โซน Standing 1 ที่นั่ง)");
+
+    // 5) ยกเลิกแล้ว (CANCELLED — ที่นั่งถูกคืนกลับระบบ)
+    await createDemoBooking({
+      userId: nokId,
+      concert: jazz,
+      zoneCode: "PA",
+      quantity: 1,
+      status: "CANCELLED",
+    });
+    console.log("   กรณีศึกษา: ยกเลิกการจอง (นก — แจ๊ส โซน Platinum L 1 ที่นั่ง)");
+
+    // 6) บัตรหมด (SOLD_OUT) — มีลูกค้าจองสำเร็จ 1 รายการ แล้วปิดที่นั่งทั้งโซน
+    await createDemoBooking({
+      userId: maleeId,
+      concert: soldOut,
+      zoneCode: "VP",
+      quantity: 1,
+      status: "COMPLETED",
+      reviewerId,
+    });
+    const soldOutZones = await prisma.zone.findMany({ where: { concertId: soldOut.id } });
+    for (const zone of soldOutZones) {
+      await prisma.seat.updateMany({
+        where: { zoneId: zone.id },
+        data: { isAvailable: false },
+      });
+      await prisma.zone.update({ where: { id: zone.id }, data: { availableSeats: 0 } });
+    }
+    console.log("   กรณีศึกษา: บัตรหมด (ซิมโฟนี — ทุกโซน SOLD_OUT ที่นั่งเหลือ 0)");
+
+    console.log("✅ การจองสาธิต 6 กรณีศึกษา (อนุมัติ / รอตรวจ / ไม่อนุมัติ / รอชำระ / ยกเลิก / บัตรหมด)");
   } else {
     console.log(`ℹ️ ข้ามการ seed ที่นั่ง (มีที่นั่งในระบบแล้ว ${seatCount} ที่นั่ง)`);
   }

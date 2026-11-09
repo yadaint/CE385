@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 import { FiCheck, FiClock, FiFileText, FiX } from "react-icons/fi";
 
 import Alert from "../components/Alert";
+import AdminDutyPanel from "../components/AdminDutyPanel";
 import Spinner from "../components/Spinner";
 import { getApiErrorMessage, getUploadUrl } from "../services/api";
-import { adminService } from "../services/adminService";
+import { adminService, type StaffDutyRecord } from "../services/adminService";
 import { concertDisplayName } from "../i18n";
 import type { AdminPayment, PaymentStatus } from "../types";
 import { formatCurrency, formatDateTime } from "../utils/format";
@@ -36,6 +37,20 @@ export default function AdminPaymentsPage() {
   const [actionId, setActionId] = useState<string | null>(null);
   const [rejectTarget, setRejectTarget] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState("");
+  // แอดมินประจำวันนี้ — แสดง "ใช้งานในชื่อ..." ให้เห็นตลอดขณะตรวจสลิป
+  const [duty, setDuty] = useState<StaffDutyRecord | null>(null);
+
+  useEffect(() => {
+    const fetchDuty = async (): Promise<void> => {
+      try {
+        setDuty(await adminService.getTodayDuty());
+      } catch {
+        setDuty(null);
+      }
+    };
+
+    void fetchDuty();
+  }, []);
 
   const fetchPayments = async (f: PaymentFilter): Promise<void> => {
     setIsLoading(true);
@@ -94,6 +109,11 @@ export default function AdminPaymentsPage() {
           {t("adminPanel.payments.title")}
         </h1>
         <p className="mt-1 text-sm text-muted">{t("adminPanel.payments.subtitle")}</p>
+
+        {/* แอดมินประจำวันนี้ — แสดง "ใช้งานในชื่อ..." ตลอดขณะตรวจสลิป */}
+        <div className="mt-6">
+          <AdminDutyPanel duty={duty} onDutyUpdated={(updated) => setDuty(updated)} />
+        </div>
 
         {/* ตัวกรอง */}
         <div className="mt-6 flex flex-wrap gap-2">
@@ -233,9 +253,25 @@ export default function AdminPaymentsPage() {
                             ` ${t("adminPanel.payments.when", { date: formatDateTime(payment.reviewedAt) })}`}
                           {payment.reviewedBy && (
                             <>
-                              {" "}
-                              {t("adminPanel.payments.byAdmin")}{" "}
-                              <b className="font-bold">{payment.reviewedBy.email}</b>
+                              {" · "}
+                              {/* รหัสแอดมินผู้ตรวจ — แสดงให้ทุกคนเห็นว่าใครเป็นคนกดยืนยัน/ปฏิเสธ */}
+                              {payment.status === "APPROVED"
+                                ? t("adminPanel.payments.approvedBy")
+                                : t("adminPanel.payments.rejectedBy")}{" "}
+                              <b className="font-mono font-bold">
+                                {payment.reviewedBy.employeeId
+                                  ? `admin${payment.reviewedBy.employeeId}`
+                                  : payment.reviewedBy.email}
+                              </b>
+                              {(() => {
+                                const name = [
+                                  payment.reviewedBy?.firstName,
+                                  payment.reviewedBy?.lastName,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ");
+                                return name ? ` (${name})` : "";
+                              })()}
                             </>
                           )}
                         </span>

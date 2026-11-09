@@ -9,7 +9,7 @@
     --navy: #122A44; --navy2: #1E4E8C; --gold: #FBBF24; --ink: #16232F;
     --muted: #617083; --soft: #E3ECF5; --line: #E2E8F0; --page: #F1F4F8;
     --success: #1E6A41; --success-bg: #E8F5EE; --warn: #7A5D1E; --warn-bg: #F8F1DF;
-    --danger: #A13327; --danger-bg: #FDECEB;
+    --danger: #A13327; --danger-bg: #FDECEB; --violet: #6D28D9; --violet-bg: #F1EAFD;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -24,14 +24,17 @@
   .slide.active { display: flex; animation: fade 0.35s ease; }
   @keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   .slide.dark { background: var(--navy); color: #fff; justify-content: center; align-items: center; text-align: center; }
+  .slide.deep { background: #0F172A; color: #fff; }
+  .slide.deep h2 { color: #fff; }
   .topbar { height: 10px; background: var(--navy2); }
   .dark .topbar { background: var(--gold); }
+  .deep .topbar { background: var(--violet); }
   h1 { font-size: 64px; font-weight: 900; letter-spacing: 3px; }
   h2 { font-size: 40px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
-  .dark h2 { color: #fff; }
+  .dark h2, .deep h2 { color: #fff; }
   .kicker { font-size: 14px; font-weight: 700; letter-spacing: 6px; color: var(--gold); text-transform: uppercase; margin-bottom: 18px; }
   .sub { font-size: 20px; color: var(--muted); }
-  .dark .sub { color: #B8CBDE; }
+  .dark .sub, .deep .sub { color: #B8CBDE; }
   .grid { display: grid; gap: 22px; margin-top: 28px; }
   .grid.cols3 { grid-template-columns: repeat(3, 1fr); }
   .grid.cols2 { grid-template-columns: repeat(2, 1fr); }
@@ -52,10 +55,12 @@
   .step span { font-size: 14px; color: var(--muted); }
   /* ticket code */
   .code {
-    font-family: Consolas, monospace; font-size: 56px; font-weight: 800; letter-spacing: 10px;
-    background: var(--navy); color: #fff; border-radius: 16px; padding: 22px 40px; display: inline-block;
+    font-family: Consolas, monospace; font-size: 48px; font-weight: 800; letter-spacing: 8px;
+    background: var(--navy); color: #fff; border-radius: 16px; padding: 20px 36px; display: inline-block;
   }
   .code .th { color: var(--gold); } .code .zn { color: #8FB3DD; } .code .st { color: #86EFAC; }
+  .code.multi { font-size: 34px; letter-spacing: 4px; }
+  .code.multi .bracket { color: #9CA8B5; font-size: 26px; }
   .legend { display: grid; grid-template-columns: 200px 1fr; gap: 14px; margin-top: 26px; text-align: left; }
   .legend .chip {
     font-family: Consolas, monospace; font-weight: 800; font-size: 20px; text-align: center;
@@ -70,8 +75,21 @@
   .rows .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 20px; margin-bottom: 12px; }
   .rows .row b { color: var(--navy2); font-size: 18px; }
   .rows .row p { font-size: 15.5px; line-height: 1.6; }
+  .rows .row b code { font-family: Consolas, monospace; background: var(--navy); color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 14px; }
   .models .row { grid-template-columns: 260px 1fr; }
   .models .row b { font-family: Consolas, monospace; color: #fff; background: var(--navy); padding: 6px 14px; border-radius: 8px; }
+  /* login split */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 28px; }
+  .panel { border-radius: 16px; padding: 26px 28px; text-align: left; }
+  .panel.user { background: #fff; border: 2px solid var(--navy2); }
+  .panel.admin { background: #0F172A; color: #E8EEF6; border: 2px solid var(--violet); }
+  .panel h3 { font-size: 21px; margin-bottom: 12px; }
+  .panel.user h3 { color: var(--navy2); }
+  .panel.admin h3 { color: #C4B5FD; }
+  .panel li { font-size: 15.5px; line-height: 1.7; margin-bottom: 8px; margin-left: 24px; }
+  .panel.user li { color: var(--ink); }
+  .deny { display: inline-block; background: var(--danger-bg); color: var(--danger); font-weight: 800; border-radius: 8px; padding: 3px 10px; font-size: 13.5px; margin-top: 10px; }
+  .grant { display: inline-block; background: var(--success-bg); color: var(--success); font-weight: 800; border-radius: 8px; padding: 3px 10px; font-size: 13.5px; margin-top: 10px; }
   /* nav */
   .nav {
     position: fixed; bottom: 24px; right: 32px; display: flex; gap: 10px; z-index: 10;
@@ -86,6 +104,8 @@
   .foot { margin-top: auto; font-size: 14px; color: #9FB2C5; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 26px; }
   .big { font-size: 26px; font-weight: 800; color: var(--ink); }
+  .tag { display: inline-block; font-family: Consolas, monospace; font-weight: 800; background: var(--navy); color: #fff; border-radius: 8px; padding: 4px 12px; font-size: 16px; }
+  .tag.gold { background: #92400E; color: #FDE68A; }
 </style>
 </head>
 <body>
@@ -96,7 +116,7 @@
   <section class="slide dark active">
     <div class="kicker">WEB APPLICATION PROJECT · CE385</div>
     <h1>BOOKING TICKET CONCERT</h1>
-    <p class="sub" style="margin-top:20px; max-width:900px;">ระบบจองตั๋วคอนเสิร์ตออนไลน์ — เลือกโซน เลือกที่นั่ง ชำระเงินผ่านสลิป<br/>และรับบัตรเข้างานพร้อม QR Code รายที่นั่ง ครบในที่เดียว</p>
+    <p class="sub" style="margin-top:20px; max-width:960px;">ระบบจองตั๋วคอนเสิร์ตออนไลน์ — เลือกโซน เลือกที่นั่ง ชำระเงินผ่านสลิป รับบัตร QR รายที่นั่ง<br/>พร้อมหลังบ้านแยกระบบล็อกอินแอดมิน บันทึกเวร และบันทึกรหัสผู้ตรวจทุกรายการ</p>
     <p class="foot" style="margin-top:60px;">React + TypeScript · Express + Prisma + PostgreSQL · Tailwind CSS · i18n (ไทย/EN)</p>
   </section>
 
@@ -106,9 +126,9 @@
     <div class="kicker">OVERVIEW</div>
     <h2>ภาพรวมโปรเจกต์</h2>
     <div class="grid cols3">
-      <div class="card"><h3>🎯 โจทย์</h3><p>การจองบัตรคอนเสิร์ตแบบเดิมมีข้อจำกัดเรื่องผังที่นั่ง คิวยาว การยืนยันการชำระเงินไม่ชัดเจน และไม่รู้สถานะบัตรแบบเรียลไทม์</p></div>
-      <div class="card"><h3>💡 โซลูชัน</h3><p>เว็บแอปจองตั๋วครบวงจร — ผู้ใช้เลือกผังโซนและที่นั่งเองจากผังจริง โอนเงินพร้อมแนบสลิป แอดมินตรวจและอนุมัติ จองสำเร็จได้บัตร QR</p></div>
-      <div class="card"><h3>🎫 ผลลัพธ์</h3><p>บัตรเข้างานพร้อม QR รายที่นั่ง รหัสตั๋วมาตรฐาน 10 ตัว สถิติรายคอนพร้อมรายงาน PDF/CSV และรองรับสองภาษา</p></div>
+      <div class="card"><h3>🎯 โจทย์</h3><p>การจองบัตรคอนเสิร์ตแบบเดิมมีข้อจำกัดเรื่องผังที่นั่ง คิวยาว การยืนยันการชำระเงินไม่ชัดเจน ไม่รู้ว่าใครตรวจสลิป และไม่รู้สถานะบัตรแบบเรียลไทม์</p></div>
+      <div class="card"><h3>💡 โซลูชัน</h3><p>เว็บแอปจองตั๋วครบวงจร — ผู้ใช้เลือกผังโซนและที่นั่งเอง โอนเงินแนบสลิป แอดมินอนุมัติพร้อม<b>บันทึกรหัสผู้ตรวจ</b> จองสำเร็จได้บัตร QR + พิมพ์ใบเสร็จ</p></div>
+      <div class="card"><h3>🎫 ผลลัพธ์</h3><p>บัตรเข้างานรวม<b>รหัสตั๋วทุกใน</b>บนบัตรเดียว + QR, ราคาแยก VAT 7%, หลังบ้านแยกระบบล็อกอินแอดมินพร้อมระบบเวรประจำวัน และรองรับสองภาษา</p></div>
     </div>
     <p class="sub" style="margin-top:30px;">ทุกสถานที่ใช้<b>ผังมาตรฐานเดียวกัน</b> (Standard End Stage): Standing ชิดเวที → VIP → Platinum → Gold → Silver → Balcony</p>
   </section>
@@ -120,8 +140,8 @@
     <h2>เทคโนโลยีที่ใช้</h2>
     <div class="grid cols3">
       <div class="card"><h3>Frontend</h3><ul class="check"><li>React 18 + TypeScript</li><li>Tailwind CSS (Design Token)</li><li>react-router-dom v6</li><li>react-i18next — ไทย / English</li><li>react-qr-code — ตั๋ว QR</li><li>Vite + axios</li></ul></div>
-      <div class="card"><h3>Backend</h3><ul class="check"><li>Node.js + Express + TypeScript</li><li>Prisma ORM + PostgreSQL</li><li>JWT Authentication</li><li>bcrypt (12 rounds)</li><li>multer — อัปโหลดสลิป/ปก</li><li>Auto-close sales job (ทุก 60 วิ)</li></ul></div>
-      <div class="card"><h3>Tools & Export</h3><ul class="check"><li>jsPDF + html2canvas — รายงาน PDF</li><li>CSV (UTF-8 BOM) เปิดใน Excel</li><li>Zod — validate สองชั้น</li><li>SVG — ปกคอนเซปต์รายคอน</li><li>nodemon + ts-node</li><li>pptxgenjs — สไลด์นำเสนอ</li></ul></div>
+      <div class="card"><h3>Backend</h3><ul class="check"><li>Node.js + Express + TypeScript</li><li>Prisma ORM + PostgreSQL (Unique constraints)</li><li>JWT Authentication — แยกบทบาท USER/ADMIN</li><li>bcrypt (12 rounds)</li><li>multer — อัปโหลดสลิป/ปก</li><li>Auto-close sales job (ทุก 60 วิ)</li></ul></div>
+      <div class="card"><h3>Tools & Export</h3><ul class="check"><li>jsPDF + html2canvas — รายงาน PDF</li><li>CSV (UTF-8 BOM) เปิดใน Excel</li><li>Zod — validate สองชั้น</li><li>SVG — ปกคอนเซปต์รายคอน</li><li>ConfirmDialog — ยืนยันก่อนลบถาวร</li><li>pptxgenjs — สไลด์นำเสนอ</li></ul></div>
     </div>
   </section>
 
@@ -134,9 +154,9 @@
       <div class="row"><div><b>สมัครสมาชิก + ยืนยันตัวตน</b></div><p>ชื่อ-นามสกุล · วันเกิด · เบอร์โทร · เลขบัตรประชาชน 13 หลัก (ตรวจ checksum) · เลขหลังบัตร (Laser code) — ตรวจทั้ง client และ server</p></div>
       <div class="row"><div><b>ผังโซนวงแหวนรอบเวที</b></div><p>Standing ชิดเวทีสุด → VIP → Platinum → Gold → Silver → Balcony พร้อม % การจองรายโซน</p></div>
       <div class="row"><div><b>เลือกที่นั่งรายตัว</b></div><p>สถานะทุกที่นั่งเรียลไทม์: ว่าง / รอตรวจสอบ / ยืนยันแล้ว — จองได้สูงสุด 4 ที่นั่งต่อรอบ</p></div>
-      <div class="row"><div><b>ชำระเงิน + นับถอยหลัง</b></div><p>โอนเข้าบัญชีกสิกรไทย พร้อมนับถอยหลังชำระ 10 นาที และแนบสลิปเพื่อรอแอดมินตรวจสอบ</p></div>
-      <div class="row"><div><b>ตั๋วเข้างาน + QR รายที่นั่ง</b></div><p>รหัสตั๋วมาตรฐาน 10 ตัว พร้อม QR ตรวจสอบหน้างาน แสดงเมื่อสลิปได้รับอนุมัติ</p></div>
-      <div class="row"><div><b>สองภาษา + ลบบัญชีเอง</b></div><p>ไทย / English สลับได้ทันทีทุกหน้า และผู้ใช้สามารถลบบัญชีพร้อมข้อมูลการจองได้ด้วยตัวเอง</p></div>
+      <div class="row"><div><b>ชำระเงิน + นับถอยหลัง</b></div><p>โอนเข้าบัญชีกสิกรไทย นับถอยหลัง 10 นาที แนบสลิปรอแอดมินตรวจ — แสดงยอดก่อน VAT / VAT 7% / ยอดรวม</p></div>
+      <div class="row"><div><b>บัตรรวมทุกรหัส + QR + ใบเสร็จ</b></div><p>บัตรใบเดียวรวมรหัสตั๋วทุกที่นั่งเรียงแนวนอน (มีเลขที่นั่งในวงเล็บเมื่อซื้อหลายใบ) · QR มีรหัสครบทุกใน · ปุ่มพิมพ์ใบเสร็จรับเงินแยก VAT</p></div>
+      <div class="row"><div><b>สองภาษา + ลบบัญชีแบบมีเงื่อนไข</b></div><p>ไทย/English สลับได้ทันที · ลบบัญชีเองได้ผ่านกล่องยืนยันเตือน — หากยังมีบัตรที่ไม่หมดอายุ ระบบจะไม่อนุญาตให้ลบ</p></div>
     </div>
   </section>
 
@@ -162,9 +182,11 @@
     <div class="topbar"></div>
     <div class="kicker">TICKET CODE</div>
     <h2>รหัสตั๋วมาตรฐาน 10 ตัวอักษร — 1 ที่นั่ง = 1 บัตร</h2>
-    <div style="text-align:center; margin-top:40px;">
+    <div style="text-align:center; margin-top:28px;">
       <span class="code"><span class="th">THA</span><span class="zn">GD</span><span class="st">14</span>K7X</span>
-      <p class="sub" style="margin-top:16px;">ตัวอย่าง: Gold ที่นั่งเบอร์ 14 ของคอนไทย — จองหลายที่นั่งได้บัตรครบทุกที่นั่ง</p>
+      <p class="sub" style="margin-top:14px;">ตัวอย่าง: Gold ที่นั่งเบอร์ 14 ของคอนไทย</p>
+      <span class="code multi" style="margin-top:18px;">THAST08T5K<span class="bracket">(08)</span> THAST09N3R<span class="bracket">(09)</span></span>
+      <p class="sub" style="margin-top:12px;">ซื้อหลายที่นั่ง → บัตรใบเดียวรวม<b>ทุกรหัส</b>เรียงแนวนอน (วงเล็บเลขที่นั่งเมื่อซื้อหลายใบ)<br/>QR สแกนเข้างานมีรหัสบัตร<b>ครบทุกใน</b> ไม่ใช่แค่ใบแรก</p>
     </div>
     <div class="legend">
       <div class="chip" style="background:#1E3A5F; color:var(--gold);">THA / NAT</div><p><b>ประเภทคอนเสิร์ต</b> — คอนไทย (THA) หรือคอนต่างประเทศ (NAT)</p>
@@ -180,65 +202,161 @@
     <div class="kicker">SALE LIFECYCLE</div>
     <h2>รอบชีวิตการขายบัตร</h2>
     <div class="life">
-      <div class="row"><div class="badge" style="background:#F1F5F9; color:#64748B;">DRAFT</div><div class="badge" style="background:#F1F5F9; color:#64748B;">ฉบับร่าง</div><p>สร้างใหม่ ยังไม่เปิดจอง — อยู่ในเมนู "แบบร่าง" ลบหรือแก้ไขได้</p></div>
+      <div class="row"><div class="badge" style="background:#F1F5F9; color:#64748B;">DRAFT</div><div class="badge" style="background:#F1F5F9; color:#64748B;">ฉบับร่าง</div><p>สร้างใหม่ ยังไม่เปิดจอง — อยู่ในเมนู "แบบร่าง" ลบหรือแก้ไขได้ (เดโม่มีตัวอย่าง)</p></div>
       <div class="row"><div class="badge" style="background:var(--success-bg); color:var(--success);">OPEN</div><div class="badge" style="background:var(--success-bg); color:var(--success);">เปิดขาย</div><p>ผู้ใช้เห็นและจองได้ — ระบบปิดอัตโนมัติเมื่อถึง <b>วันสุดท้ายของการขาย</b> (ตรวจทุก 60 วินาที)</p></div>
       <div class="row"><div class="badge" style="background:var(--warn-bg); color:var(--warn);">CLOSED</div><div class="badge" style="background:var(--warn-bg); color:var(--warn);">ปิดขาย</div><p>ปิดชั่วคราวหรือหมดเวลา — เปิดใหม่ได้</p></div>
-      <div class="row"><div class="badge" style="background:var(--danger-bg); color:var(--danger);">SOLD_OUT</div><div class="badge" style="background:var(--danger-bg); color:var(--danger);">บัตรหมด</div><p>ทุกโซนเปิดขายหมด — ระบบตั้งสถานะอัตโนมัติ</p></div>
+      <div class="row"><div class="badge" style="background:var(--danger-bg); color:var(--danger);">SOLD_OUT</div><div class="badge" style="background:var(--danger-bg); color:var(--danger);">บัตรหมด</div><p>ทุกโซนเปิดขายหมด — ระบบตั้งสถานะอัตโนมัติ (เดโม่มีตัวอย่าง "ซิมโฟนีออฟไฟร์เวิร์คส์")</p></div>
       <div class="row"><div class="badge" style="background:var(--danger-bg); color:var(--danger);">CANCELLED</div><div class="badge" style="background:var(--danger-bg); color:var(--danger);">ยกเลิกถาวร</div><p>ยกเลิกกลางคันเพื่อป้องกันปัญหา — <b>แก้ไขข้อมูลไม่ได้อีก</b></p></div>
     </div>
   </section>
 
-  <!-- 8 แอดมิน -->
+  <!-- 8 ระบบล็อกอินแอดมิน -->
+  <section class="slide deep">
+    <div class="topbar"></div>
+    <div class="kicker">ADMIN LOGIN — แยกระบบสมบูรณ์</div>
+    <h2>ล็อกอินแอดมิน: อีเมลกลาง + รหัสผ่านส่วนตัว</h2>
+    <div class="split">
+      <div class="panel user">
+        <h3>🌐 หน้าเว็บผู้ใช้ — /login</h3>
+        <ul>
+          <li>สำหรับ <b>บัญชี USER เท่านั้น</b> — จองบัตร ดูตั๋ว ชำระเงิน</li>
+          <li>ใส่บัญชีแอดมิน → โดนปฏิเสธทันที <span class="deny">403 — ให้ไป /admin/login</span></li>
+          <li>Navbar แสดงเมนูผู้ใช้อย่างเดียว</li>
+        </ul>
+      </div>
+      <div class="panel admin">
+        <h3>🛡️ หลังบ้าน — /admin/login</h3>
+        <ul>
+          <li>อีเมลกลางของทีม: <b style="font-family:Consolas;">admin@concerthub.dev</b> (กรอกไว้ให้แล้ว)</li>
+          <li>ระบุตัวตนด้วย<b>รหัสผ่านส่วนตัวของแต่ละคน</b> — ห้ามตั้งรหัสซ้ำกัน</li>
+          <li>ใส่บัญชี USER → <span class="deny">403 — ให้ไป /login</span></li>
+          <li>ล็อกอินสำเร็จ = <b>เริ่มเวรทันทีอัตโนมัติ</b></li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:24px;">ทั้งสองหน้าตรวจสิทธิ์ที่ server ทั้งคู่ — เช็ครหัสผ่านก่อนเช็ค role กันการเดาว่าใครเป็นแอดมิน · เมนูหลังบ้าน (AdminNavbar) แสดงงานแอดมินเท่านั้น</p>
+  </section>
+
+  <!-- 9 เวร + ผู้ตรวจ -->
   <section class="slide">
     <div class="topbar"></div>
-    <div class="kicker">ADMIN FEATURES</div>
-    <h2>ฟีเจอร์สำหรับแอดมิน</h2>
+    <div class="kicker">ON-DUTY & VERIFIER</div>
+    <h2>ระบบเวรประจำวัน + บันทึกรหัสผู้ตรวจสลิป</h2>
+    <div class="two">
+      <div class="card"><h3>🗓️ เวรประจำวัน (StaffDuty)</h3>
+        <ul class="check">
+          <li>ล็อกอินหลังบ้าน = เริ่มเวรทันทีอัตโนมัติ (ปิดเวรค้างให้เอง)</li>
+          <li>แถบ <b>"ใช้งานในชื่อ ชื่อ-นามสกุล (รหัส)"</b> แสดงบนหน้าตรวจสลิป</li>
+          <li>ปุ่ม "เปลี่ยนผู้ทำงาน" สลับเวรกลางคันได้</li>
+        </ul>
+      </div>
+      <div class="card"><h3>✅ บันทึกรหัสผู้ตรวจสลิป</h3>
+        <ul class="check">
+          <li>กดอนุมัติ/ปฏิเสธ → บันทึก <b>รหัสแอดมินคนกด</b> ลงฐานข้อมูล</li>
+          <li>รายการ "อนุมัติแล้ว" แสดง <b>อนุมัติโดย รหัส admin0002 (ชื่อ)</b> + เวลา</li>
+          <li>แอดมินทุกคนเห็นได้ว่าใครตรวจการจองลูกค้ารายไหน</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:24px;">ข้อมูลเวรเก็บในตาราง <span class="tag">StaffDuty</span> — เวรที่เปิดอยู่ = แถวที่ endedAt เป็น null · ลบบัญชีแอดมินแล้วประวัติเวรถูกจัดการอัตโนมัติ</p>
+  </section>
+
+  <!-- 10 จัดการแอดมิน -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">MANAGE ADMINS</div>
+    <h2>เพิ่ม / ลดแอดมิน — ยืนยันด้วยรหัสลับทุกครั้ง</h2>
     <div class="rows">
-      <div class="row"><div><b>สถิติรายคอนเสิร์ต</b></div><p>เลือกคอน (แยกหมวดเปิดขาย/ปิดขาย) → รายได้รวม รายได้รายโซน สถานะบัตรทั้งหมด + ตารางรายโซน</p></div>
-      <div class="row"><div><b>จัดการคอนเสิร์ต (เรียลไทม์)</b></div><p>ผังโซนวงแหวน + สถานะทุกที่นั่ง ว่าง/รอตรวจสอบ/ยืนยันแล้ว — รีเฟรชอัตโนมัติทุก 10 วินาที</p></div>
-      <div class="row"><div><b>รายการตรวจสอบสลิป</b></div><p>ดูสลิป อนุมัติ/ปฏิเสธพร้อมเหตุผล — บันทึกชื่อแอดมินผู้ตรวจทุกรายการ</p></div>
-      <div class="row"><div><b>Export PDF + CSV</b></div><p>ส่งออกรายงานสถิติและรายการจองเป็นเอกสาร (PDF แบ่งหน้าอัตโนมัติ / CSV UTF-8 เปิดใน Excel)</p></div>
-      <div class="row"><div><b>สร้าง + แก้ไข + แบบร่าง</b></div><p>ปกคอนเซปต์ (16:9) · ชื่อ 2 ภาษา · วันสุดท้ายขาย (ปิดอัตโนมัติ) · ยกเลิกการขายกลางคัน · ลบแบบร่างได้</p></div>
+      <div class="row"><div><b>🔒 รหัสลับ 8 ตัวก่อนเข้าเมนู</b></div><p>กด "เพิ่มแอดมิน" ต้องใส่รหัสยืนยัน (Main0110) ใหม่<b>ทุกครั้ง</b> — ใส่ผิดจะไม่เห็นข้อมูลใดเลย และ server ตรวจรหัสทุกคำสั่งเพิ่ม/ลด</p></div>
+      <div class="row"><div><b>🆔 รหัสพนักงาน 4 หลัก (ตัวเลข)</b></div><p>ระบบสร้างอีเมลให้อัตโนมัติ <code>admin + รหัส @concerthub.dev</code> เช่น รหัส 0001 → admin0001@concerthub.dev — กรองให้พิมพ์ได้แค่ตัวเลข 4 ตัว</p></div>
+      <div class="row"><div><b>➕ เพิ่มแอดมินใหม่</b></div><p>กรอกชื่อ · เบอร์ · วันเกิด · รหัสพนักงาน · รหัสผ่านส่วนตัว — บัญชีใหม่ล็อกอินเข้าหลังบ้านได้ทันที</p></div>
+      <div class="row"><div><b>➖ ลดแอดมิน</b></div><p>รายชื่อแอดมินทั้งหมดพร้อมปุ่มลบ — ยืนยันผ่านกล่องเตือนก่อนลบถาวร · <b>ลบบัญชีตัวเองไม่ได้</b> · ประวัติเวรถูกจัดการอัตโนมัติ</p></div>
+      <div class="row"><div><b>🚫 กันรหัสผ่านซ้ำ</b></div><p>ล็อกอินใช้อีเมลกลางคนเดียว รหัสผ่านจึงต้องไม่ซ้ำ — ตรวจตอนสร้างบัญชี และตรวจซ้ำอีกชั้นตอนล็อกอิน</p></div>
     </div>
   </section>
 
-  <!-- 9 Data model -->
+  <!-- 11 ฟีเจอร์แอดมิน -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">ADMIN FEATURES</div>
+    <h2>ฟีเจอร์สำหรับแอดมิน (เมนูเรียงใหม่)</h2>
+    <div class="rows">
+      <div class="row"><div><b>1 · การจองทั้งหมด</b></div><p>ดูการจองของลูกค้าทุกรายการ กรองตามสถานะ พร้อมรหัสตั๋วรายที่นั่ง</p></div>
+      <div class="row"><div><b>2 · ตรวจสอบสลิป</b></div><p>ดูสลิป อนุมัติ/ปฏิเสธพร้อมเหตุผล — บันทึก<b>รหัสแอดมินผู้ตรวจ</b>และแสดงในรายการอนุมัติแล้วให้ทุกคนเห็น</p></div>
+      <div class="row"><div><b>3 · สถิติและข้อมูล</b></div><p>รายได้รวม รายได้รายโซน สถานะบัตร + Export PDF / CSV</p></div>
+      <div class="row"><div><b>4 · แบบร่าง</b></div><p>คอนที่ยังไม่เปิดขาย — แก้ไข เปิดขาย หรือลบทิ้ง</p></div>
+      <div class="row"><div><b>5 · สร้างคอนเสิร์ต</b></div><p>ปกคอนเซปต์ (16:9) · ชื่อ 2 ภาษา · หลายวันแสดง · ตั้งราคา/เปิดขายรายโซน · วันสุดท้ายขายปิดอัตโนมัติ</p></div>
+      <div class="row"><div><b>6 · เพิ่มแอดมิน</b></div><p>พื้นที่จำกัดสิทธิ์ — ต้องใส่รหัสลับทุกครั้ง (ดูสไลด์จัดการแอดมิน)</p></div>
+    </div>
+  </section>
+
+  <!-- 12 ความปลอดภัยบัญชี -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">ACCOUNT SAFETY</div>
+    <h2>ความปลอดภัยของบัญชีและข้อมูล</h2>
+    <div class="rows">
+      <div class="row"><div><b>ข้อมูลตัวตนใช้ซ้ำไม่ได้</b></div><p>อีเมล · เบอร์โทร · เลขบัตรหน้า-หลัง — บังคับ <b>Unique ระดับฐานข้อมูล</b> สมัครซ้ำไม่ได้แม้พร้อมกัน ต้องลบบัญชีเดิมก่อนจึงสมัครใหม่ได้</p></div>
+      <div class="row"><div><b>กันลบบัญชีเมื่อมีบัตรค้าง</b></div><p>ยังมีบัตรคอนเสิร์ตที่ไม่หมดอายุ (งานยังไม่จัดผ่าน) → ระบบปฏิเสธการลบพร้อมบอกจำนวน — ต้องใช้บัตรหรือยกเลิกจองก่อน</p></div>
+      <div class="row"><div><b>ยืนยันก่อนลบถาวร</b></div><p>กล่องยืนยัน (Modal) แจ้งหมายเหตุสีแดงว่าลบแล้วกู้คืนไม่ได้ ต้องกดยืนยันอีกชั้น — ไม่ใช้ป๊อปอัปเบราว์เซอร์ธรรมดา</p></div>
+      <div class="row"><div><b>รหัสลับตรวจที่ server</b></div><p>การเพิ่ม/ลดแอดมินต้องส่งรหัสยืนยันมาทุกคำสั่ง — ข้ามหน้าเว็บยิง API ตรงก็โดนปฏิเสธเหมือนกัน</p></div>
+      <div class="row"><div><b>แยกบทบาททุกด่าน</b></div><p>ทุก API หลังบ้านตรวจ JWT + authorize("ADMIN") ทุกครั้ง — โทเคนของ USER เรียก API หลังบ้านไม่ได้</p></div>
+    </div>
+  </section>
+
+  <!-- 13 Data model -->
   <section class="slide">
     <div class="topbar"></div>
     <div class="kicker">DATA MODEL</div>
     <h2>โครงสร้างฐานข้อมูล (Prisma + PostgreSQL)</h2>
     <div class="rows models">
-      <div class="row"><b>User</b><p>บัญชี + ข้อมูลยืนยันตัวตน (ชื่อ / เบอร์ / เลขบัตรหน้า-หลัง / วันเกิด) — ลบบัญชีเองได้</p></div>
-      <div class="row"><b>Concert</b><p>คอนเสิร์ต + ชื่อ 2 ภาษา + ปกคอนเซปต์ + saleEndDate (ปิดขายอัตโนมัติ)</p></div>
+      <div class="row"><b>User</b><p>บัญชี + ข้อมูลยืนยันตัวตน + <b>employeeId (รหัสพนักงาน — unique)</b> — เมล/เบอร์/บัตรบังคับ unique ทุกฟิลด์</p></div>
+      <div class="row"><b>Concert</b><p>คอนเสิร์ต + ชื่อ 2 ภาษา + ปก + saleEndDate (ปิดขายอัตโนมัติ)</p></div>
       <div class="row"><b>Venue + VenueZone</b><p>ผังโซน FIX ประจำสถานที่ — ทุกสถานที่ใช้ผังมาตรฐานเดียวกัน</p></div>
       <div class="row"><b>Zone + Seat</b><p>โซนขายบัตรรายคอน + ที่นั่งรายตัว (isAvailable อัปเดตแบบ transaction)</p></div>
       <div class="row"><b>Booking + BookingSeat</b><p>การจองถือที่นั่ง + <b>รหัสตั๋วรายที่นั่ง</b> (SERIALIZABLE transaction + retry)</p></div>
-      <div class="row"><b>Payment</b><p>สลิป + สถานะ + ผู้ตรวจ (reviewedBy) + เวลาตรวจ</p></div>
+      <div class="row"><b>Payment</b><p>สลิป + สถานะ + <b>ผู้ตรวจพร้อมรหัสพนักงาน</b> + เวลาตรวจ</p></div>
+      <div class="row"><b>StaffDuty</b><p><b>เวรประจำวันของแอดมิน</b> — ใครอยู่เวร เวลาเริ่ม/เลิก (ใหม่)</p></div>
       <div class="row"><b>Notification</b><p>แจ้งเตือนบัตรหมดรายโซน/ทั้งคอน อัตโนมัติ</p></div>
     </div>
     <p class="sub" style="margin-top:18px;">ทุกความสัมพันธ์กำหนด onDelete: Cascade — ลบคอน/ลบบัญชี แล้วข้อมูลลูกถูกจัดการอัตโนมัติ</p>
   </section>
 
-  <!-- 10 สรุป -->
+  <!-- 14 ข้อมูลเดโม่ -->
+  <section class="slide">
+    <div class="topbar"></div>
+    <div class="kicker">DEMO DATA</div>
+    <h2>ข้อมูลตัวอย่างในระบบ (Seed)</h2>
+    <div class="grid cols3">
+      <div class="card"><h3>🎤 คอนเสิร์ต 7 งาน</h3><p>ครบทุกประเภท THAI/INTL × SOLO/GROUP — ร็อค · EDM · แจ๊ส · K-POP · เปียโน · อินดี้ · ซิมโฟนี พร้อมกรณี OPEN 5 / DRAFT 1 / SOLD_OUT 1</p></div>
+      <div class="card"><h3>👥 บัญชีครบ</h3><p>แอดมิน 5 คน (อีเมลกลาง + รหัสผ่านส่วนตัวไม่ซ้ำกัน) · ลูกค้า 5 คน — โปรไฟล์ครบเบอร์/เลขบัตรไม่ซ้ำกัน</p></div>
+      <div class="card"><h3>🎟️ การจอง 6 กรณีศึกษา</h3><p>อนุมัติแล้ว · รอตรวจสลิป · ไม่อนุมัติ (พร้อมเหตุผล) · รอชำระเงิน · ยกเลิกแล้ว · บัตรหมดยกโหล — พร้อมรหัสตั๋วรายที่นั่งจริง</p></div>
+    </div>
+    <div class="two" style="margin-top:24px;">
+      <div class="card"><h3>🔑 บัญชีทดลองหลังบ้าน</h3><p>อีเมลกลาง <code style="font-family:Consolas;">admin@concerthub.dev</code><br/>รหัสผ่าน: Admin1234 (0000) · Admin0001 (0001) · Staff1234 (0002) · Admin0003 (0003)</p></div>
+      <div class="card"><h3>🔑 บัญชีทดลองผู้ใช้</h3><p>user@concerthub.dev / User1234 · somchai@example.com · malee@example.com · prakan@example.com · nok@example.com (User1234 ทั้งหมด)</p></div>
+    </div>
+  </section>
+
+  <!-- 15 สรุป -->
   <section class="slide dark">
     <div class="kicker">SUMMARY</div>
     <h2>สรุปโปรเจกต์</h2>
-    <div style="max-width:1000px; text-align:left; margin-top:30px;">
+    <div style="max-width:1050px; text-align:left; margin-top:30px;">
       <ul class="check" style="font-size:20px;">
-        <li style="color:#E8EEF6;">ระบบจองตั๋วครบวงจร ตั้งแต่เลือกที่นั่งจนได้บัตร QR เข้างาน</li>
-        <li style="color:#E8EEF6; margin-top:14px;">ผังโซนมาตรฐานสากล เหมือนกันทุกสถานที่ ทั้งหน้าสร้างและหน้าจอง</li>
-        <li style="color:#E8EEF6; margin-top:14px;">รหัสตั๋วมาตรฐาน 10 ตัว รายที่นั่ง พร้อม QR สแกนเข้างาน</li>
-        <li style="color:#E8EEF6; margin-top:14px;">ปิดขายอัตโนมัติตามวันสุดท้าย + ยกเลิกการขายกลางคัน + ลบแบบร่าง</li>
-        <li style="color:#E8EEF6; margin-top:14px;">สถิติรายคอน 3 มุมมอง ส่งออกรายงาน PDF / CSV ได้</li>
-        <li style="color:#E8EEF6; margin-top:14px;">สองภาษา ไทย/English — ผู้ใช้ลบบัญชีตัวเองได้</li>
+        <li style="color:#E8EEF6;">ระบบจองตั๋วครบวงจร ตั้งแต่เลือกที่นั่งจนได้บัตร QR เข้างาน + พิมพ์ใบเสร็จแยก VAT 7%</li>
+        <li style="color:#E8EEF6; margin-top:12px;">บัตรใบเดียวรวมรหัสตั๋วทุกที่นั่ง (มีเลขที่นั่งกำกับ) · QR สแกนแล้วได้รหัสครบทุกใน</li>
+        <li style="color:#E8EEF6; margin-top:12px;">หลังบ้านแยกระบบล็อกอิน — อีเมลกลาง + รหัสผ่านส่วนตัว ระบุตัวตนแอดมินแต่ละคน</li>
+        <li style="color:#E8EEF6; margin-top:12px;">ระบบเวรประจำวันอัตโนมัติ + บันทึกรหัสผู้ตรวจสลิปทุกรายการ แอดมินทุกคนตรวจย้อนหลังได้</li>
+        <li style="color:#E8EEF6; margin-top:12px;">เพิ่ม/ลดแอดมินได้เองภายใต้รหัสลับ 8 ตัว — ตรวจที่ server ทุกครั้ง</li>
+        <li style="color:#E8EEF6; margin-top:12px;">ข้อมูลตัวตนไม่ซ้ำ (Unique ระดับ DB) · กันลบบัญชีเมื่อมีบัตรไม่หมดอายุ · สองภาษา ไทย/EN</li>
       </ul>
     </div>
-    <p class="foot" style="margin-top:70px;">BOOKING TICKET CONCERT — ขอบคุณครับ 🎫</p>
+    <p class="foot" style="margin-top:60px;">BOOKING TICKET CONCERT — ขอบคุณครับ 🎫</p>
   </section>
 </div>
 
 <div class="counter" id="counter"></div>
-<div class="progress" id="progress"></div>
 <div class="nav">
   <button onclick="go(-1)" title="ก่อนหน้า">‹</button>
   <button onclick="go(1)" title="ถัดไป">›</button>

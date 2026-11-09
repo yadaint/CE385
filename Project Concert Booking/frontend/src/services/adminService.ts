@@ -34,6 +34,54 @@ export interface UpdateConcertPayload {
   artistType?: "SOLO" | "GROUP";
 }
 
+/** บัญชีแอดมินที่เพิ่งสร้าง (คืนจาก POST /admin/staff) */
+export interface AdminStaffAccount {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  employeeId: string;
+}
+
+/** ข้อมูลสำหรับเพิ่มบัญชีแอดมินใหม่ — อีเมลระบบสร้างให้เองจาก employeeId */
+export interface CreateStaffPayload {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  /** รูปแบบ YYYY-MM-DD จาก <input type="date"> */
+  dateOfBirth: string;
+  employeeId: string;
+  password: string;
+}
+
+/** บัญชีแอดมิน (จาก GET /admin/staff — ใช้ในหน้าเลือกเวร) */
+export interface AdminStaffSummary {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  employeeId: string | null;
+  createdAt: string;
+}
+
+/** เวรที่กำลังเปิดอยู่ — endedAt = null คือกำลังทำงานอยู่ตอนนี้ */
+export interface StaffDutyRecord {
+  id: string;
+  staffId: string;
+  workDate: string;
+  startedAt: string;
+  endedAt: string | null;
+  staff: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    employeeId: string | null;
+  };
+}
+
 export const adminService = {
   /** GET /admin/stats — สถิติภาพรวมทั้งระบบ */
   async getStats(): Promise<AdminStats> {
@@ -45,6 +93,51 @@ export const adminService = {
   async getConcerts(): Promise<AdminConcert[]> {
     const { data } = await api.get<{ data: { concerts: AdminConcert[] } }>("/admin/concerts");
     return data.data.concerts;
+  },
+
+  /** POST /admin/staff — เพิ่มบัญชีแอดมินใหม่ (อีเมลสร้างอัตโนมัติจากรหัสพนักงาน — ต้องแนบรหัสยืนยัน 8 ตัวทุกครั้ง) */
+  async createStaff(payload: CreateStaffPayload, accessCode: string): Promise<AdminStaffAccount> {
+    const { data } = await api.post<ApiResponse<{ staff: AdminStaffAccount }>>("/admin/staff", {
+      ...payload,
+      employeeId: payload.employeeId.trim().toUpperCase(),
+      accessCode: accessCode.trim(),
+    });
+    return data.data.staff;
+  },
+
+  /** POST /admin/staff/verify-access — ตรวจรหัสยืนยัน 8 ตัวก่อนปลดล็อกหน้าจัดการแอดมิน (ผิด = 403) */
+  async verifyStaffAccess(accessCode: string): Promise<void> {
+    await api.post("/admin/staff/verify-access", { accessCode: accessCode.trim() });
+  },
+
+  /** POST /admin/staff/remove — ลบบัญชีแอดมิน (ต้องแนบรหัสยืนยัน 8 ตัวทุกครั้ง) */
+  async removeStaff(staffId: string, accessCode: string): Promise<void> {
+    await api.post("/admin/staff/remove", {
+      staffId,
+      accessCode: accessCode.trim(),
+    });
+  },
+
+  /** GET /admin/staff — รายชื่อบัญชีแอดมินทั้งหมด (ใช้ในหน้าเลือกเวร) */
+  async getStaffList(): Promise<AdminStaffSummary[]> {
+    const { data } = await api.get<ApiResponse<{ staff: AdminStaffSummary[] }>>("/admin/staff");
+    return data.data.staff;
+  },
+
+  /** GET /admin/staff/duty/today — ใครอยู่เวรวันนี้ (null = ยังไม่มีใครเลือก) */
+  async getTodayDuty(): Promise<StaffDutyRecord | null> {
+    const { data } = await api.get<ApiResponse<{ duty: StaffDutyRecord | null }>>(
+      "/admin/staff/duty/today",
+    );
+    return data.data.duty;
+  },
+
+  /** POST /admin/staff/duty — เลือกใครเป็นคนทำงานวันนี้ (ระบบปิดเวรเดิมให้อัตโนมัติ) */
+  async setTodayDuty(staffId: string): Promise<StaffDutyRecord> {
+    const { data } = await api.post<ApiResponse<{ duty: StaffDutyRecord }>>("/admin/staff/duty", {
+      staffId,
+    });
+    return data.data.duty;
   },
 
   /** DELETE /concerts/:id — ลบคอนเสิร์ตแบบร่าง (DRAFT เท่านั้น) */

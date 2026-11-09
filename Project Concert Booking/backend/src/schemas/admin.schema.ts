@@ -52,6 +52,30 @@ export const markNotificationsReadSchema = z.object({
   ids: z.array(z.string().min(1)).optional(),
 });
 
+/** Body สำหรับเลือกแอดมินประจำเวรวันนี้ (ทำหลังล็อกอิน ก่อนใช้หลังบ้าน) */
+export const setDutySchema = z.object({
+  staffId: z
+    .string({ required_error: "กรุณาเลือกแอดมินที่ทำงานวันนี้" })
+    .min(1, "กรุณาเลือกแอดมินที่ทำงานวันนี้"),
+});
+
+/** รหัสยืนยันการจัดการแอดมิน — ต้องเป็น 8 ตัวอักษรพอดี (ฟิคไว้ที่ ADMIN_ACCESS_CODE) */
+export const accessCodeSchema = z
+  .string({ required_error: "กรุณากรอกรหัสยืนยัน" })
+  .trim()
+  .length(8, "รหัสยืนยันต้องมี 8 ตัวอักษร");
+
+/** Body ตรวจรหัสยืนยันก่อนเข้าหน้าจัดการแอดมิน */
+export const staffAccessSchema = z.object({ accessCode: accessCodeSchema });
+
+/** Body ลบบัญชีแอดมิน — ระบุตัวที่จะลบ + รหัสยืนยัน */
+export const removeStaffSchema = z.object({
+  staffId: z
+    .string({ required_error: "ต้องระบุบัญชีแอดมินที่ต้องการลบ" })
+    .min(1, "ต้องระบุบัญชีแอดมินที่ต้องการลบ"),
+  accessCode: accessCodeSchema,
+});
+
 /** Query กรองแจ้งเตือนเฉพาะยังไม่อ่าน */
 export const adminNotificationQuerySchema = z.object({
   unread: z.enum(["true", "false"]).optional(),

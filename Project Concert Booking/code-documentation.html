@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BOOKING TICKET CONCERT — Code Documentation</title>
+<style>
+  :root {
+    --navy: #122A44; --navy2: #1E4E8C; --gold: #FBBF24; --ink: #16232F;
+    --muted: #617083; --line: #E2E8F0; --page: #F1F4F8;
+    --success: #1E6A41; --danger: #A13327; --violet: #6D28D9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Leelawadee UI", "Noto Sans Thai", sans-serif;
+    background: var(--page); color: var(--ink); font-size: 15.5px; line-height: 1.7;
+  }
+  /* ─── sidebar ─── */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 300px; overflow-y: auto;
+    background: var(--navy); color: #C9D8E8; padding: 24px 0 40px;
+  }
+  .sidebar .logo { padding: 0 24px 18px; border-bottom: 1px solid #22405F; }
+  .sidebar .logo b { color: #fff; font-size: 16px; letter-spacing: 1px; display: block; }
+  .sidebar .logo span { color: #FBBF24; font-size: 11px; letter-spacing: 3px; font-weight: 700; }
+  .sidebar a {
+    display: block; padding: 9px 24px; color: #B9CBDD; text-decoration: none;
+    font-size: 13.5px; border-left: 3px solid transparent; transition: all 0.15s;
+  }
+  .sidebar a:hover { color: #fff; background: #16304E; }
+  .sidebar a.active { color: #FBBF24; border-left-color: #FBBF24; background: #16304E; }
+  .sidebar .group { padding: 16px 24px 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 2.5px; color: #6E8CA9; text-transform: uppercase; }
+  /* ─── main ─── */
+  .main { margin-left: 300px; padding: 40px 56px 120px; max-width: 1080px; }
+  section { margin-bottom: 72px; scroll-margin-top: 30px; }
+  h1 { font-size: 34px; color: var(--navy); margin-bottom: 6px; }
+  .doc-kicker { font-size: 12px; font-weight: 800; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; background: var(--navy); display: inline-block; padding: 5px 14px; border-radius: 8px; margin-bottom: 14px; }
+  h2 { font-size: 26px; color: var(--navy); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--navy2); }
+  h3 { font-size: 19px; color: var(--navy2); margin: 28px 0 10px; }
+  p { margin-bottom: 12px; }
+  ul, ol { margin: 0 0 14px 26px; }
+  li { margin-bottom: 7px; }
+  b { color: var(--navy); }
+  .files { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .file {
+    font-family: Consolas, monospace; font-size: 12.5px; background: #fff;
+    border: 1px solid var(--line); border-radius: 8px; padding: 5px 12px; color: var(--navy2);
+  }
+  .file::before { content: "📄 "; }
+  /* code block */
+  pre.code {
+    background: #0F172A; color: #E2E8F0; border-radius: 12px; padding: 18px 20px;
+    font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.6;
+    overflow-x: auto; margin: 14px 0 18px; border: 1px solid #1E293B;
+    white-space: pre;
+  }
+  pre.code .cm { color: #6B8CAD; }   /* comment */
+  pre.code .kw { color: #93C5FD; }   /* keyword */
+  pre.code .st { color: #86EFAC; }   /* string */
+  pre.code .fn { color: #FBBF24; }   /* function/attr */
+  pre.code .er { color: #FCA5A5; }   /* emphasis/red */
+  code.inline {
+    font-family: Consolas, monospace; background: #E3ECF5; color: var(--navy2);
+    border-radius: 6px; padding: 1px 7px; font-size: 13.5px;
+  }
+  /* callouts */
+  .note, .warn {
+    border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 14.5px;
+  }
+  .note { background: #E8F0FB; border-left: 4px solid var(--navy2); }
+  .warn { background: #FDECEB; border-left: 4px solid var(--danger); }
+  /* tables */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; background: #fff; font-size: 14px; }
+  th { background: var(--navy); color: #fff; text-align: left; padding: 10px 14px; font-size: 13px; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:nth-child(even) td { background: #F8FAFC; }
+  td code, th code { font-family: Consolas, monospace; font-size: 12.5px; color: var(--navy2); }
+  .badge { display: inline-block; font-family: Consolas, monospace; font-weight: 700; font-size: 12px; padding: 2px 10px; border-radius: 8px; }
+  .b-get { background: #E8F5EE; color: var(--success); }
+  .b-post { background: #E8F0FB; color: var(--navy2); }
+  .b-patch { background: #F8F1DF; color: #7A5D1E; }
+  .b-del { background: #FDECEB; color: var(--danger); }
+  .top { position: fixed; bottom: 24px; right: 32px; z-index: 10; }
+  .top button {
+    border: none; background: var(--navy2); color: #fff; border-radius: 50%;
+    width: 46px; height: 46px; font-size: 20px; cursor: pointer;
+  }
+  @media (max-width: 1100px) { .sidebar { display: none; } .main { margin-left: 0; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<nav class="sidebar">
+  <div class="logo">
+    <span>CE385 · DOCUMENTATION</span>
+    <b>BOOKING TICKET CONCERT</b>
+  </div>
+  <div class="group">เริ่มต้น</div>
+  <a href="#structure">1. โครงสร้างโปรเจกต์</a>
+  <a href="#database">2. ฐานข้อมูล (Prisma)</a>
+  <a href="#env">3. Config (env.ts)</a>
+  <div class="group">Backend</div>
+  <a href="#auth">4. ระบบยืนยันตัวตน (Auth)</a>
+  <a href="#booking">5. Flow การจอง (Transaction)</a>
+  <a href="#admin-be">6. Admin Controllers</a>
+  <a href="#middleware">7. Middlewares</a>
+  <div class="group">Frontend</div>
+  <a href="#fe-structure">8. โครงสร้าง Frontend</a>
+  <a href="#fe-context">9. AuthContext + Services</a>
+  <a href="#fe-layout">10. Layout แยก 2 โลก</a>
+  <a href="#fe-ticket">11. บัตร + QR + VAT + ใบเสร็จ</a>
+  <a href="#fe-duty">12. ระบบเวร + จัดการแอดมิน</a>
+  <a href="#fe-dialog">13. ConfirmDialog + กันลบบัญชี</a>
+  <div class="group">อ้างอิง</div>
+  <a href="#api">14. ตาราง API ทั้งหมด</a>
+  <a href="#seed">15. Seed ข้อมูลเดโม่</a>
+  <a href="#run">16. วิธีรันโปรเจกต์</a>
+</nav>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main">
+
+<!-- ═══ 1 โครงสร้าง ═══ -->
+<section id="structure">
+  <div class="doc-kicker">PROJECT STRUCTURE</div>
+  <h1>โครงสร้างโปรเจกต์ทั้งหมด</h1>
+  <p>โปรเจกต์แบ่งเป็น 2 ส่วนหลัก — <b>backend</b> (REST API) และ <b>frontend</b> (SPA) — โดยแต่ละส่วนมีหน้าที่ชัดเจน: backend รับผิดชบการคำนวณ ตรวจสอบ และเก็บข้อมูลทั้งหมด ส่วน frontend แสดงผลและตรวจข้อมูลเบื้องต้นก่อนส่ง</p>
+<pre class="code">Project Concert Booking/
+├── backend/
+│   ├── prisma/
+│   │   ├── schema.prisma          <span class="cm"># โครงสร้างฐานข้อมูลทั้งหมด (8 models)</span>
+│   │   ├── seed.ts                <span class="cm"># ข้อมูลเดโม่ (แอดมิน/ลูกค้า/คอน 7 งาน/การจอง 6 กรณี)</span>
+│   │   └── migrations/            <span class="cm"># ประวัติ migration 12 ไฟล์</span>
+│   ├── src/
+│   │   ├── config/env.ts          <span class="cm"># env variables ตรวจด้วย Zod ตอน startup</span>
+│   │   ├── lib/prisma.ts          <span class="cm"># PrismaClient instance เดียวทั้งแอป</span>
+│   │   ├── schemas/               <span class="cm"># Zod schemas — ตรวจ request body/query/params</span>
+│   │   ├── middlewares/           <span class="cm"># authenticate / authorize / validate / error</span>
+│   │   ├── controllers/           <span class="cm"># logic หลัก (auth, booking, admin, concert, venue)</span>
+│   │   ├── routes/                <span class="cm"># ผูก URL เข้ากับ controller</span>
+│   │   ├── utils/                 <span class="cm"># asyncHandler, seats (ผังที่นั่ง)</span>
+│   │   └── server.ts              <span class="cm"># express app + listen</span>
+│   └── .env                       <span class="cm"># DATABASE_URL / JWT / ADMIN_ACCESS_CODE ...</span>
+├── frontend/
+│   └── src/
+│       ├── pages/                 <span class="cm"># หน้าเว็บทั้งหมด (15 หน้า)</span>
+│       ├── components/            <span class="cm"># component ใช้ซ้ำ (Navbar, TicketCard, ConfirmDialog...)</span>
+│       ├── context/AuthContext.tsx <span class="cm"># สถานะล็อกอินกลาง (user/token/ฟังก์ชัน auth)</span>
+│       ├── services/              <span class="cm"># เรียก API ผ่าน axios แยกตามหมวด</span>
+│       ├── schemas/               <span class="cm"># Zod ฝั่ง client (ตรวจก่อนส่ง)</span>
+│       ├── utils/                 <span class="cm"># format (VAT) / receipt (พิมพ์ใบเสร็จ) / validation</span>
+│       ├── i18n/                  <span class="cm"># คำแปลไทย/อังกฤษ</span>
+│       └── App.tsx                <span class="cm"># routes + เลือก layout ผู้ใช้/หลังบ้าน</span>
+└── presentation.html / tools/make-pptx.cjs</pre>
+  <div class="note"><b>หลักการแยกชั้น:</b> <code class="inline">routes</code> รับ URL → <code class="inline">middleware</code> ตรวจ token/ข้อมูล → <code class="inline">controller</code> ทำงาน → <code class="inline">Prisma</code> คุยกับ PostgreSQL → ตอบ JSON รูปแบบเดียวกันทุกเส้น <code class="inline">{ success, message, data }</code></div>
+</section>
+
+<!-- ═══ 2 ฐานข้อมูล ═══ -->
+<section id="database">
+  <div class="doc-kicker">DATABASE</div>
+  <h1>2. ฐานข้อมูล (prisma/schema.prisma)</h1>
+  <p>มีทั้งหมด <b>8 models</b> — ทุกความสัมพันธ์กำหนด <code class="inline">onDelete: Cascade</code> ลบพ่อแล้วลูกถูกลบตามอัตโนมัติ และฟิลด์ตัวตนสำคัญถูกบังคับ <code class="inline">@unique</code> ที่ระดับฐานข้อมูล</p>
+
+  <h3>User — บัญชีผู้ใช้และแอดมิน (ตารางเดียวแยกด้วย role)</h3>
+<pre class="code"><span class="kw">model</span> User {
+  id              String   <span class="fn">@id</span> <span class="fn">@default</span>(cuid())
+  email           String   <span class="er">@unique</span>            <span class="cm">// ห้ามซ้ำ — ระดับฐานข้อมูล</span>
+  password        String                       <span class="cm">// bcrypt hash 12 rounds</span>
+  role            Role     <span class="fn">@default</span>(USER)      <span class="cm">// USER | ADMIN</span>
+  firstName       String?
+  lastName        String?
+  phone           String?  <span class="er">@unique</span>            <span class="cm">// เบอร์โทรใช้ซ้ำไม่ได้</span>
+  dateOfBirth     DateTime?
+  nationalId      String?  <span class="er">@unique</span>            <span class="cm">// เลขหน้าบัตร 13 หลัก</span>
+  nationalIdBack  String?  <span class="er">@unique</span>            <span class="cm">// Laser code หลังบัตร</span>
+  employeeId      String?  <span class="er">@unique</span>            <span class="cm">// รหัสพนักงาน (เฉพาะแอดมิน) — ใช้สร้างอีเมล admin{รหัส}@domain</span>
+  bookings        Booking[]
+  reviewedPayments Payment[] <span class="fn">@relation</span>(<span class="st">"ReviewedPayments"</span>)
+  staffDuties     StaffDuty[]
+}</pre>
+  <div class="warn"><b>ทำไมบังคับ unique ที่ DB ไม่ใช่แค่โค้ด?</b> ถ้าตรวจเฉพาะใน controller คนสองคนกดสมัครพร้อมกัน (มิลลิวินาทีเดียวกัน) จะผ่านการตรวจทั้งคู่แล้วเก็บซ้ำได้ — คอลัมน์ <code class="inline">UNIQUE</code> ของ PostgreSQL ปฏิเสธเองทันทีแม้พร้อมกัน (ระบบจะโยน Prisma error <code class="inline">P2002</code> ซึ่ง error middleware แปลงเป็น 409 ให้)</div>
+
+  <h3>Booking + BookingSeat — 1 ที่นั่ง = 1 รหัสตั๋ว</h3>
+<pre class="code"><span class="kw">model</span> Booking {
+  id         String        <span class="fn">@id</span> <span class="fn">@default</span>(cuid())
+  userId     String                        <span class="cm">// ใครจอง (Cascade ลบตามเจ้าของ)</span>
+  concertId  String
+  zoneId     String
+  showDate   DateTime                      <span class="cm">// วันแสดงที่เลือกจอง — ใช้ตัดสิน "บัตรหมดอายุ"</span>
+  ticketCode String <span class="er">@unique</span>                  <span class="cm">// รหัสประจำการจอง (= รหัสที่นั่งแรก)</span>
+  status     BookingStatus <span class="fn">@default</span>(PENDING)
+  seats      BookingSeat[]
+}
+<span class="kw">model</span> BookingSeat {
+  bookingId  String
+  seatId     String
+  ticketCode String? <span class="er">@unique</span>               <span class="cm">// ★ รหัสตั๋วประจำที่นั่ง — 1 ที่นั่ง = 1 รหัส</span>
+  @@id([bookingId, seatId])                 <span class="cm">// PK คู่ — ที่นั่งเดียวอยู่ได้ 1 การจอง</span>
+}</pre>
+  <p>สองระดับของรหัส: <code class="inline">Booking.ticketCode</code> ใช้อ้างอิงการจองทั้งรอบ ส่วน <code class="inline">BookingSeat.ticketCode</code> คือบัตรรายที่นั่งที่พิมพ์บนบัตรจริง (หน้าบัตรจะรวมทุกในมาแสดงบนบัตรเดียว)</p>
+
+  <h3>StaffDuty — บันทึกเวรแอดมิน (ตารางใหม่)</h3>
+<pre class="code"><span class="kw">model</span> StaffDuty {
+  id        String    <span class="fn">@id</span> <span class="fn">@default</span>(cuid())
+  staffId   String                    <span class="cm">// → User (Cascade)</span>
+  workDate  DateTime  <span class="fn">@db</span>.Date        <span class="cm">// วันที่ทำงาน (ตัดเวลา)</span>
+  startedAt DateTime  <span class="fn">@default</span>(now())
+  endedAt   DateTime?                 <span class="cm">// null = เวรเปิดอยู่ (กำลังทำงานอยู่ตอนนี้)</span>
+}</pre>
+  <p>หลักการ: แถวที่ <code class="inline">endedAt = null</code> คือเวรที่กำลังเปิดอยู่ — เมื่อแอดมินคนใหม่ล็อกอิน ระบบจะปิดเวรเก่า (กรอก endedAt) แล้วเปิดแถวใหม่ให้คนนั้นใน <b>transaction เดียว</b> จึงมีเวรเปิดได้ครั้งละ 1 เสมอ</p>
+
+  <h3>Enum ทั้งหมด</h3>
+  <table>
+    <tr><th>Enum</th><th>ค่า</th><th>ใช้ทำอะไร</th></tr>
+    <tr><td>Role</td><td>USER, ADMIN</td><td>แยกสิทธิ์ — สมัครใหม่ได้ USER เสมอ ห้ามเลือก</td></tr>
+    <tr><td>BookingStatus</td><td>PENDING → PENDING_VERIFICATION → COMPLETED / REJECTED / CANCELLED</td><td>วงจรชีวิตการจอง — CANCELLED เท่านั้นที่ไม่ถือว่าบัตรมีอายุคงเหลือ</td></tr>
+    <tr><td>PaymentStatus</td><td>PENDING_VERIFICATION, APPROVED, REJECTED</td><td>สถานะสลิปต่อ 1 การจอง (bookingId @unique)</td></tr>
+    <tr><td>ConcertSaleStatus</td><td>DRAFT, OPEN, CLOSED, SOLD_OUT, CANCELLED</td><td>วงจรการขาย — SOLD_OUT ตั้งโดยระบบเมื่อบัตรหมดทุกโซน</td></tr>
+  </table>
+</section>
+
+<!-- ═══ 3 env ═══ -->
+<section id="env">
+  <div class="doc-kicker">BACKEND CONFIG</div>
+  <h1>3. Config (src/config/env.ts)</h1>
+  <div class="files"><span class="file">backend/src/config/env.ts</span></div>
+  <p>ทุก environment variable ถูกตรวจด้วย Zod ตั้งแต่ startup — ค่าไหนผิด/ขาด แอป<b>ปิดตัวทันที</b>พร้อมข้อความบอกชัดเจน ไม่รอให้พังกลางทาง</p>
+<pre class="code"><span class="kw">const</span> envSchema = z.<span class="fn">object</span>({
+  NODE_ENV:  z.<span class="fn">enum</span>([<span class="st">"development"</span>, <span class="st">"test"</span>, <span class="st">"production"</span>]).<span class="fn">default</span>(<span class="st">"development"</span>),
+  PORT:      z.<span class="fn">coerce</span>.<span class="fn">number</span>().<span class="fn">int</span>().<span class="fn">positive</span>().<span class="fn">default</span>(4000),
+  DATABASE_URL: z.string().<span class="fn">min</span>(1),
+  JWT_SECRET: z.string().<span class="fn">min</span>(16),
+  JWT_EXPIRES_IN_SECONDS: z.<span class="fn">coerce</span>.<span class="fn">number</span>().<span class="fn">default</span>(86_400),          <span class="cm">// token อยู่ 1 วัน</span>
+  CORS_ORIGIN: z.string().<span class="fn">url</span>().<span class="fn">default</span>(<span class="st">"http://localhost:5173"</span>),
+  ADMIN_EMAIL_DOMAIN: z.string().<span class="fn">default</span>(<span class="st">"concerthub.dev"</span>),           <span class="cm">// โดเมนอีเมลแอดมิน</span>
+  ADMIN_ACCESS_CODE:  z.string().<span class="fn">min</span>(8).<span class="fn">default</span>(<span class="st">"Main0110"</span>),          <span class="cm">// รหัสลับเพิ่ม/ลดแอดมิน</span>
+  ADMIN_LOGIN_EMAIL:  z.string().<span class="fn">email</span>().<span class="fn">default</span>(<span class="st">"admin@concerthub.dev"</span>), <span class="cm">// อีเมลกลาง</span>
+});</pre>
+  <ul>
+    <li><b>ADMIN_ACCESS_CODE</b> — รหัสลับ 8 ตัวสำหรับเพิ่ม/ลดแอดมิน ตรวจ<b>ที่ server ทุกคำสั่ง</b> (ข้ามหน้าเว็บยิง API ตรงก็ถูกปฏิเสธ)</li>
+    <li><b>ADMIN_LOGIN_EMAIL</b> — อีเมลกลางที่แอดมินทุกคนใช้ล็อกอินหลังบ้าน</li>
+    <li>เปลี่ยนค่าได้ผ่าน <code class="inline">.env</code> โดยไม่ต้องแก้โค้ด</li>
+  </ul>
+</section>
+
+<!-- ═══ 4 Auth ═══ -->
+<section id="auth">
+  <div class="doc-kicker">BACKEND · AUTH</div>
+  <h1>4. ระบบยืนยันตัวตน (auth.controller.ts)</h1>
+  <div class="files"><span class="file">backend/src/controllers/auth.controller.ts</span><span class="file">backend/src/routes/auth.routes.ts</span></div>
+
+  <h3>4.1 register — สมัครสมาชิก (ได้ USER เสมอ)</h3>
+  <p>ลำดับการทำงานสำคัญมาก — ตรวจข้อมูลซ้ำ<b>ก่อน</b>เข้ารหัสรหัสผ่าน เพื่อไม่เสียเวลาคำนวณ bcrypt ฟรี:</p>
+<pre class="code"><span class="kw">export const</span> register = <span class="fn">asyncHandler</span>(<span class="kw">async</span> (req, res) => {
+  <span class="kw">const</span> { email, password, ..., nationalId, nationalIdBack } = req.body;
+
+  <span class="cm">// 1) เช็คอีเมลซ้ำ → 409</span>
+  <span class="kw">const</span> existingUser = <span class="kw">await</span> prisma.user.<span class="fn">findUnique</span>({ where: { email } });
+  <span class="kw">if</span> (existingUser) <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"อีเมลนี้ถูกใช้งานแล้ว"</span>, 409);
+
+  <span class="cm">// 2) จัดรูปแบบบัตร — ตัดตัวคั่น/พิมพ์ใหญ่ เพื่อให้ unique เทียบกันได้แม่นยำ</span>
+  <span class="kw">const</span> normalizedNationalId    = nationalId.<span class="fn">replace</span>(/\D/g, <span class="st">""</span>);
+  <span class="kw">const</span> normalizedNationalIdBack = nationalIdBack.<span class="fn">replace</span>(/[-\s]/g, <span class="st">""</span>).<span class="fn">toUpperCase</span>();
+
+  <span class="cm">// 3) เช็คเบอร์/บัตรหน้า/บัตรหลัง พร้อมกัน (Promise.all — เร็วขึ้น 3 เท่า)</span>
+  <span class="kw">const</span> [existingPhone, existingNationalId, existingNationalIdBack] =
+    <span class="kw">await</span> Promise.all([
+      prisma.user.<span class="fn">findFirst</span>({ where: { phone } }),
+      prisma.user.<span class="fn">findFirst</span>({ where: { nationalId: normalizedNationalId } }),
+      prisma.user.<span class="fn">findFirst</span>({ where: { nationalIdBack: normalizedNationalIdBack } }),
+    ]);
+  <span class="cm">// → ข้อความ error บอกด้วยว่า "ต้องลบบัญชีเดิมออกก่อน"</span>
+
+  <span class="cm">// 4) ผ่านหมด → hash รหัสผ่าน + สร้างบัญชี role USER</span>
+  <span class="kw">const</span> user = <span class="kw">await</span> prisma.user.<span class="fn">create</span>({
+    data: { email, password: <span class="kw">await</span> bcrypt.<span class="fn">hash</span>(password, 12), ..., role: <span class="st">"USER"</span> },
+  });
+  res.<span class="fn">status</span>(201).json({ success: <span class="kw">true</span>, data: { user } });
+});</pre>
+  <div class="note"><b>จุดออกแบบ:</b> role ไม่รับจาก request body — บังคับ USER เสมอ ทำให้ไม่มีใครสมัครเป็นแอดมินเองได้ และการเช็คซ้ำใช้ค่า normalize แล้ว (บัตร `1-2345-67890-12-3` กับ `1234567890123` คือเลขเดียวกัน)</div>
+
+  <h3>4.2 login — หน้าผู้ใช้ (ปฏิเสธแอดมิน)</h3>
+<pre class="code"><span class="kw">const</span> user = <span class="kw">await</span> prisma.user.<span class="fn">findUnique</span>({ where: { email } });
+<span class="kw">if</span> (!user)                <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"อีเมลหรือรหัสผ่านไม่ถูกต้อง"</span>, 401);
+<span class="kw">const</span> ok = <span class="kw">await</span> bcrypt.<span class="fn">compare</span>(password, user.password);
+<span class="kw">if</span> (!ok)                  <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"อีเมลหรือรหัสผ่านไม่ถูกต้อง"</span>, 401);
+
+<span class="cm">// ★ แอดมินห้ามล็อกอินหน้าผู้ใช้ — เช็ค "หลัง" รหัสผ่านถูก กันการเดาอีเมลแอดมิน</span>
+<span class="kw">if</span> (user.role === <span class="st">"ADMIN"</span>) {
+  <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"บัญชีนี้เป็นบัญชีแอดมิน — ต้องเข้าสู่ระบบผ่านหน้าหลังบ้านเท่านั้น (/admin/login)"</span>, 403);
+}
+<span class="kw">const</span> token = <span class="fn">generateToken</span>({ sub: user.id, email: user.email, role: user.role });</pre>
+
+  <h3>4.3 adminLogin — อีเมลกลาง + รหัสผ่านส่วนตัว (หัวใจของหลังบ้าน)</h3>
+  <p>ทุกแอดมินใช้อีเมลเดียวกัน (<code class="inline">ADMIN_LOGIN_EMAIL</code>) ตัวตนจริงระบุด้วยรหัสผ่าน — ระบบจึงต้อง<b>เทียบรหัสผ่านกับแอดมินทุกคน</b>:</p>
+<pre class="code"><span class="kw">export const</span> adminLogin = <span class="fn">asyncHandler</span>(<span class="kw">async</span> (req, res) => {
+  <span class="kw">const</span> { email, password } = req.body;
+
+  <span class="cm">// 1) ต้องใช้อีเมลกลางเท่านั้น — อีเมลส่วนตัวใช้ไม่ได้</span>
+  <span class="kw">if</span> (email.toLowerCase() !== env.ADMIN_LOGIN_EMAIL.toLowerCase())
+    <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"แอดมินต้องเข้าสู่ระบบด้วยอีเมลกลาง: ..."</span>, 401);
+
+  <span class="cm">// 2) เทียบรหัสผ่านกับแอดมินทุกคน — ตรงคนไหน = ล็อกอินเป็นคนนั้น</span>
+  <span class="kw">const</span> admins = <span class="kw">await</span> prisma.user.<span class="fn">findMany</span>({ where: { role: <span class="st">"ADMIN"</span> } });
+  <span class="kw">let</span> matched = <span class="kw">null</span>, duplicateCount = 0;
+  <span class="kw">for</span> (<span class="kw">const</span> admin <span class="kw">of</span> admins) {
+    <span class="kw">if</span> (<span class="kw">await</span> bcrypt.<span class="fn">compare</span>(password, admin.password)) {
+      <span class="kw">if</span> (matched) duplicateCount += 1;   <span class="cm">// รหัสตรงมากกว่า 1 คน → ระบุตัวตนไม่ได้</span>
+      <span class="kw">else</span> matched = admin;
+    }
+  }
+  <span class="kw">if</span> (!matched)         <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"รหัสผ่านไม่ถูกต้อง..."</span>, 401);
+  <span class="kw">if</span> (duplicateCount)   <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"รหัสผ่านนี้ซ้ำกับแอดมินมากกว่า 1 คน..."</span>, 409);
+
+  <span class="cm">// 3) ล็อกอิน = เริ่มเวรทันที (ปิดเวรค้าง + เปิดเวรใหม่ ใน transaction เดียว)</span>
+  <span class="kw">const</span> dutyNow = <span class="kw">new</span> <span class="fn">Date</span>();
+  <span class="kw">const</span> workDate = <span class="kw">new</span> <span class="fn">Date</span>(Date.UTC(dutyNow.getFullYear(), dutyNow.getMonth(), dutyNow.getDate(), 12));
+  <span class="kw">await</span> prisma.<span class="fn">$transaction</span>([
+    prisma.staffDuty.<span class="fn">updateMany</span>({ where: { endedAt: <span class="kw">null</span> }, data: { endedAt: dutyNow } }),
+    prisma.staffDuty.<span class="fn">create</span>({ data: { staffId: user.id, workDate, startedAt: dutyNow } }),
+  ]);
+
+  <span class="kw">const</span> token = <span class="fn">generateToken</span>({ sub: user.id, email: user.email, role: user.role });
+  <span class="cm">// → token ฝัง role ของ "คนที่รหัสตรง" ไม่ใช่เมลกลาง</span>
+});</pre>
+  <div class="note"><b>เกร็ด 3 ข้อ:</b> ① ตรวจรหัสผ่านก่อนเช็ค role เสมอ — ไม่รั่วว่าอีเมลไหนเป็นแอดมิน ② เวลา `workDate` ใช้เที่ยงวัน UTC (ชั่วโมง 12) เพื่อให้ตัดเป็น DATE ถูกวันแม้ timezone เพี้ยน ③ รหัสผ่านซ้ำถูกกันตั้งแต่ตอนสร้างบัญชี อีกชั้นตอนล็อกอิน (409)</div>
+
+  <h3>4.4 deleteAccount — ลบบัญชีแบบมีเงื่อนไข</h3>
+<pre class="code"><span class="cm">// ★ กันลบ: ถ้ายังมีบัตรที่ยังไม่หมดอายุ (งาน = วันนี้ขึ้นไป และไม่ใช่ CANCELLED) ห้ามลบ</span>
+<span class="kw">const</span> startOfToday = <span class="kw">new</span> <span class="fn">Date</span>(); startOfToday.<span class="fn">setHours</span>(0, 0, 0, 0);
+<span class="kw">const</span> activeBookings = <span class="kw">await</span> prisma.booking.<span class="fn">count</span>({
+  where: { userId, status: { not: <span class="st">"CANCELLED"</span> }, showDate: { gte: startOfToday } },
+});
+<span class="kw">if</span> (activeBookings > 0)
+  <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">`ยังลบบัญชีไม่ได้ — คุณมีบัตรคอนเสิร์ตที่ยังไม่หมดอายุค้างอยู่ ${activeBookings} รายการ...`</span>, 409);
+
+<span class="cm">// ปลดชื่อผู้ตรวจสลิปออกก่อน (กัน FK block) แล้วค่อยลบ — cascade ลบ booking/seat/slip ตาม</span>
+<span class="kw">await</span> prisma.payment.<span class="fn">updateMany</span>({ where: { reviewedBy: userId }, data: { reviewedBy: <span class="kw">null</span> } });
+<span class="kw">await</span> prisma.user.<span class="fn">delete</span>({ where: { id: userId } });</pre>
+  <p>สถานะที่ถือว่า "บัตรยังมีอายุ" ครอบคลุมทั้ง รอชำระ / รอตรวจสลิป / สลิปโดนปฏิเสธ / จองสำเร็จรอเข้างาน — ตราบใดที่วันแสดงยังเป็นวันนี้หรืออนาคต และไม่ใช่ CANCELLED ก็ลบบัญชีไม่ได้</p>
+</section>
+
+<!-- ═══ 5 Booking ═══ -->
+<section id="booking">
+  <div class="doc-kicker">BACKEND · BOOKING</div>
+  <h1>5. Flow การจอง — Transaction ระดับ SERIALIZABLE</h1>
+  <div class="files"><span class="file">backend/src/controllers/booking.controller.ts</span><span class="file">backend/src/utils/seats.ts</span></div>
+  <p>ปัญหาคลาสสิกของระบบจอง: <b>สองคนกดจองที่นั่งเดียวกันพร้อมกัน</b> ถ้าอ่าน-เขียนแบบธรรมดาจะได้ที่นั่งเดียวกันทั้งคู่ ระบบนี้จึงรันทุกขั้นตอนการจองใน <code class="inline">$transaction</code> ระดับ isolation <b>SERIALIZABLE</b> (PostgreSQL จะเลิกทำรายการที่ชนกันเอง) พร้อม retry อัตโนมัติเมื่อโดน error P2034:</p>
+<pre class="code"><span class="kw">const</span> performBookingTransaction = (userId, seatIds, showDate) =>
+  prisma.<span class="fn">$transaction</span>(<span class="kw">async</span> (tx) => {
+    <span class="cm">// 1) โหลดที่นั่งที่ขอ — ขาดตัวใด = 404</span>
+    <span class="kw">const</span> seats = <span class="kw">await</span> tx.seat.<span class="fn">findMany</span>({ where: { id: { in: seatIds } }, include: { zone: <span class="kw">true</span> } });
+    <span class="cm">// 2) ทุกที่นั่งต้องโซนเดียวกัน + ว่างทั้งหมด → 409 ถ้าขัดแย้ง</span>
+    <span class="cm">// 3) ถือที่นั่ง:  isAvailable = false</span>
+    <span class="cm">// 4) หัก availableSeats ของโซน และแจ้งเตือน "โซนหมด/คอนหมด" อัตโนมัติ</span>
+    <span class="cm">// 5) สร้าง Booking + BookingSeat พร้อมรหัสตั๋วรายที่นั่ง</span>
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.<span class="er">Serializable</span>, timeout: 15_000 });</pre>
+
+  <h3>การสร้างรหัสตั๋วรายที่นั่ง + กันซ้ำ 5 รอบ</h3>
+<pre class="code"><span class="cm">// รูปแบบ: {THA|NAT} + รหัสโซน + เลขที่นั่ง 2 หลัก + สุ่ม 3 ตัว = 10 ตัวอักษร</span>
+<span class="kw">const</span> bookedSeats = [...seats].<span class="fn">sort</span>((a, b) => a.seatNumber - b.seatNumber);
+<span class="kw">let</span> seatTicketCodes = bookedSeats.<span class="fn">map</span>((seat) =>
+  <span class="fn">generateTicketCode</span>(concert.origin, zone.code, seat.seatNumber));
+
+<span class="kw">for</span> (<span class="kw">let</span> round = 0; round &lt; 5; round++) {
+  <span class="kw">const</span> seatClash   = <span class="kw">await</span> tx.bookingSeat.<span class="fn">findMany</span>({ where: { ticketCode: { in: seatTicketCodes } } });
+  <span class="kw">const</span> bookingClash = <span class="kw">await</span> tx.booking.<span class="fn">findMany</span>({ where: { ticketCode: { in: seatTicketCodes } } });
+  <span class="kw">const</span> used = <span class="kw">new</span> <span class="fn">Set</span>([...seatClash, ...bookingClash].<span class="fn">map</span>((row) => row.ticketCode));
+  <span class="kw">if</span> (used.size === 0) <span class="kw">break</span>;
+  seatTicketCodes = seatTicketCodes.<span class="fn">map</span>((code) =>
+    used.<span class="fn">has</span>(code) ? <span class="fn">generateTicketCode</span>(concert.origin, zone.code, <span class="fn">Number</span>(code.<span class="fn">slice</span>(5, 7))) : code);
+}</pre>
+  <p>จากนั้นสร้าง <code class="inline">Booking</code> โดย <code class="inline">ticketCode: seatTicketCodes[0]</code> (รหัสอ้างอิงการจอง) และแต่ละ <code class="inline">BookingSeat</code> ได้รหัสของตัวเอง — หน้าบัตรจึงแสดงได้ครบทุกใน</p>
+
+  <h3>cancelBooking — ยกเลิกแล้วคืนที่นั่งทันที</h3>
+  <p>ยกเลิก = transaction ย้อนกลับ: ปล่อยที่นั่ง (<code class="inline">isAvailable: true</code>) + คืน <code class="inline">availableSeats</code> + ตั้งสถานะ CANCELLED — ที่นั่งกลับมาให้คนอื่นจองได้ทันที ถ้าคอนที่เคยหมดกลับมาว่าง ระบบก็ดันสถานะออกจาก SOLD_OUT ให้เอง</p>
+</section>
+
+<!-- ═══ 6 Admin BE ═══ -->
+<section id="admin-be">
+  <div class="doc-kicker">BACKEND · ADMIN</div>
+  <h1>6. Admin Controllers — สลิป, แอดมิน, เวร</h1>
+  <div class="files"><span class="file">backend/src/controllers/admin.controller.ts</span><span class="file">backend/src/routes/admin.routes.ts</span></div>
+  <p>ทุกเส้นทางในไฟล์ routes นี้ถูกครอบด้วย <code class="inline">router.use(authenticate, authorize("ADMIN"))</code> — JWT ต้องเป็น ADMIN ถึงจะผ่านทุกเส้น</p>
+
+  <h3>6.1 อนุมัติ/ปฏิเสธสลิป — บันทึกรหัสผู้ตรวจ</h3>
+<pre class="code"><span class="kw">const</span> result = <span class="kw">await</span> prisma.<span class="fn">$transaction</span>(<span class="kw">async</span> (tx) => {
+  <span class="kw">const</span> payment = <span class="kw">await</span> tx.payment.<span class="fn">findUnique</span>({ where: { id: paymentId } });
+  <span class="kw">if</span> (payment.status !== <span class="st">"PENDING_VERIFICATION"</span>)
+    <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"สลิปนี้ถูกตรวจสอบไปแล้ว"</span>, 400);     <span class="cm">// กดซ้ำไม่ได้</span>
+  <span class="kw">const</span> approved = <span class="kw">await</span> tx.payment.<span class="fn">update</span>({
+    where: { id: paymentId },
+    data: { status: <span class="st">"APPROVED"</span>, reviewedAt: <span class="kw">new</span> <span class="fn">Date</span>(), <span class="er">reviewedBy: adminId</span> },  <span class="cm">// ★ ใครกด</span>
+  });
+  <span class="kw">const</span> booking = <span class="kw">await</span> tx.booking.<span class="fn">update</span>({
+    where: { id: approved.bookingId }, data: { status: <span class="st">"COMPLETED"</span> },
+  });
+  <span class="kw">return</span> { payment: approved, booking };
+});
+
+<span class="cm">// ดึงข้อมูลแอดมินผู้ตรวจ (รวมรหัสพนักงาน) มาแนบใน response</span>
+<span class="kw">const</span> reviewer = <span class="kw">await</span> prisma.user.<span class="fn">findUnique</span>({
+  where: { id: adminId },
+  select: { id: <span class="kw">true</span>, email: <span class="kw">true</span>, <span class="er">employeeId: true</span>, firstName: <span class="kw">true</span>, lastName: <span class="kw">true</span> },
+});
+res.<span class="fn">status</span>(200).json({ ..., data: { payment: { ...result.payment, reviewedBy: reviewer } } });</pre>
+  <p>ฝั่ง <code class="inline">getAllPayments</code> ก็ include <code class="inline">reviewer { employeeId, firstName, lastName }</code> ด้วย — ทำให้หน้าตรวจสลิปแสดง "อนุมัติโดย รหัส admin0002 (สมหญิง)" ได้จากข้อมูลจริงใน DB ทุกครั้งที่โหลด</p>
+
+  <h3>6.2 จัดการแอดมิน — ประตูรหัสลับ Main0110</h3>
+<pre class="code"><span class="cm">// helper ร่วม — รหัสผิด = 403 ทันที ทุกฟังก์ชันเพิ่ม/ลดต้องเรียกก่อน</span>
+<span class="kw">const</span> assertStaffAccess = (accessCode: string): <span class="kw">void</span> => {
+  <span class="kw">if</span> (accessCode !== env.ADMIN_ACCESS_CODE)
+    <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"รหัสยืนยันไม่ถูกต้อง — คุณไม่มีสิทธิ์เพิ่มหรือลดแอดมิน"</span>, 403);
+};
+
+<span class="cm">// createStaff: สร้างบัญชี ADMIN อีเมลจากรหัสพนักงาน 4 หลัก</span>
+<span class="kw">const</span> email = `admin${employeeId.toLowerCase()}@${env.ADMIN_EMAIL_DOMAIN}`;
+<span class="fn">assertStaffAccess</span>(accessCode);                          <span class="cm">// ① รหัสลับ</span>
+<span class="cm">// ② ตรวจซ้ำ 3 ทาง: รหัสพนักงาน / เบอร์โทร / อีเมลที่สร้างได้ → 409</span>
+<span class="cm">// ③ กันรหัสผ่านซ้ำกับแอดมินคนอื่น (bcrypt.compare ทีละคน) → 409</span>
+<span class="kw">const</span> staff = <span class="kw">await</span> prisma.user.<span class="fn">create</span>({ data: { email, role: <span class="st">"ADMIN"</span>, employeeId, ... } });
+
+<span class="cm">// removeStaff: ลบบัญชีแอดมิน — ห้ามลบตัวเอง</span>
+<span class="kw">if</span> (staffId === req.user!.id) <span class="kw">throw new</span> <span class="fn">AppError</span>(<span class="st">"ไม่สามารถลบบัญชีของตัวเองได้"</span>, 400);
+<span class="kw">await</span> prisma.payment.<span class="fn">updateMany</span>({ where: { reviewedBy: staffId }, data: { reviewedBy: <span class="kw">null</span> } });
+<span class="kw">await</span> prisma.user.<span class="fn">delete</span>({ where: { id: staffId } });   <span class="cm">// เวรประจำวัน cascade ลบตาม</span></pre>
+
+  <h3>6.3 เวรประจำวัน — getTodayDuty / setTodayDuty</h3>
+<pre class="code"><span class="cm">// ช่วง "วันนี้" คำนวณแบบ UTC เพื่อไม่ให้ timezone เพี้ยนข้ามวัน</span>
+<span class="kw">const</span> rangeStart = <span class="kw">new</span> <span class="fn">Date</span>(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+<span class="kw">const</span> duty = <span class="kw">await</span> prisma.staffDuty.<span class="fn">findFirst</span>({
+  where: { workDate: { gte: rangeStart, lt: rangeEnd }, endedAt: <span class="kw">null</span> },  <span class="cm">// เวรเปิดอยู่ + วันนี้</span>
+  include: { staff: { select: { id, email, firstName, lastName, employeeId } } },
+});</pre>
+  <p>หน้าเว็บเรียก <code class="inline">GET /admin/staff/duty/today</code> — ถ้าได้ <code class="inline">null</code> หมายถึงยังไม่มีใครอยู่เวร (แต่เพราะล็อกอินแอดมินตั้งเวรให้เองอัตโนมัติแล้ว จึงเกิดยากมาก — เกิดได้เมื่อข้ามวันใหม่)</p>
+</section>
+
+<!-- ═══ 7 Middleware ═══ -->
+<section id="middleware">
+  <div class="doc-kicker">BACKEND · MIDDLEWARES</div>
+  <h1>7. Middlewares — ด่านตรวจก่อนถึง controller</h1>
+  <div class="files"><span class="file">backend/src/middlewares/auth.middleware.ts</span><span class="file">validate.middleware.ts</span><span class="file">error.middleware.ts</span></div>
+  <table>
+    <tr><th>Middleware</th><th>หน้าที่</th><th>ตัวอย่างผลลัพธ์</th></tr>
+    <tr><td><code>authenticate</code></td><td>อ่าน header <code>Authorization: Bearer …</code> ตรวจ JWT ด้วย JWT_SECRET → แปะ <code>req.user</code></td><td>token หมด/ปลอม → 401</td></tr>
+    <tr><td><code>authorize("ADMIN")</code></td><td>เช็ค <code>req.user.role</code> ตรงตามที่กำหนด</td><td>USER เรียก API หลังบ้าน → 403</td></tr>
+    <tr><td><code>validate({ body: schema })</code></td><td>รัน Zod กับ body/query/params — ผ่านแล้วค่อยเรียก controller</td><td>ข้อมูลผิดรูปแบบ → 422 พร้อม error รายฟิลด์</td></tr>
+  </table>
+  <h3>errorHandler — แปลงทุก error เป็น JSON รูปแบบเดียว</h3>
+<pre class="code"><span class="kw">if</span> (error <span class="kw">instanceof</span> ZodError)                          <span class="cm">// 1) validation → 422 + errors[]</span>
+<span class="kw">if</span> (error <span class="kw">instanceof</span> MulterError)                       <span class="cm">// 2) ไฟล์ใหญ่เกิน → 400</span>
+<span class="kw">if</span> (error <span class="kw">instanceof</span> AppError)                          <span class="cm">// 3) error ที่เราโยนเอง → ตาม statusCode</span>
+<span class="kw">if</span> (error <span class="kw">instanceof</span> Prisma.PrismaClientKnownRequestError) {
+  <span class="kw">if</span> (error.code === <span class="st">"P2002"</span>) <span class="cm">// 4) unique ชน → 409 "มีข้อมูลนี้อยู่ในระบบแล้ว"</span>
+  <span class="kw">if</span> (error.code === <span class="st">"P2025"</span>) <span class="cm">// 5) ไม่พบข้อมูล → 404</span>
+}
+<span class="cm">// ที่เหลือ → 500 (production ซ่อนรายละเอียด)</span></pre>
+  <div class="note"><b>ทำไมสำคัญ:</b> ทุกจุดใน controller แค่ <code class="inline">throw new AppError("ข้อความไทย", statusCode)</code> ไม่ต้อง try/catch เอง — asyncHandler ส่งต่อให้ errorHandler จัดการให้ตรงกันทั้งระบบ โค้ด controller สั้นลงมาก</div>
+</section>
+
+<!-- ═══ 8 FE structure ═══ -->
+<section id="fe-structure">
+  <div class="doc-kicker">FRONTEND</div>
+  <h1>8. โครงสร้าง Frontend และการแยก 2 โลก</h1>
+  <div class="files"><span class="file">frontend/src/App.tsx</span><span class="file">components/AdminNavbar.tsx</span><span class="file">components/Navbar.tsx</span></div>
+  <p><code class="inline">App.tsx</code> แบ่ง layout ตาม URL ด้วย component <code class="inline">AppShell</code> — หลักการคือ "เส้นทางไหนอยู่โลกไหน ใช้เครื่องแบบโลกนั้น":</p>
+<pre class="code"><span class="kw">function</span> <span class="fn">AppShell</span>() {
+  <span class="kw">const</span> { user } = <span class="fn">useAuth</span>();
+  <span class="kw">const</span> { pathname } = <span class="fn">useLocation</span>();
+  <span class="kw">const</span> isAdminRoute     = pathname.<span class="fn">startsWith</span>(<span class="st">"/admin"</span>);
+  <span class="kw">const</span> isAdminLoginPage = pathname === <span class="st">"/admin/login"</span>;
+  <span class="kw">const</span> isAdminArea      = isAdminRoute && !isAdminLoginPage;
+
+  <span class="kw">return</span> (
+    &lt;div className=<span class="st">"flex min-h-screen flex-col bg-page"</span>&gt;
+      {isAdminArea ? &lt;<span class="fn">AdminNavbar</span> /&gt; : &lt;<span class="fn">Navbar</span> /&gt;}      <span class="cm">// หลังบ้านใช้แถบดำเฉพาะแอดมิน</span>
+      &lt;main&gt;...&lt;Routes /&gt;...&lt;/main&gt;
+      {!isAdminArea && &lt;<span class="fn">footer</span> /&gt;}                        <span class="cm">// หลังบ้านไม่มี footer เว็บผู้ใช้</span>
+    &lt;/div&gt;
+  );
+}</pre>
+  <ul>
+    <li><b>AdminNavbar</b> — ธีมดำ-ม่วง BACK OFFICE ADMIN เมนูเรียงใหม่: การจองทั้งหมด → ตรวจสลิป → สถิติและข้อมูล → แบบร่าง → สร้างคอนเสิร์ต → เพิ่มแอดมิน ใช้ <code class="inline">flex-wrap</code> เมนูล้นตัดบรรทัดเอง (แก้บั๊กเมนูล้นเลื่อนไม่ได้)</li>
+    <li><b>Navbar (ผู้ใช้)</b> — แอดมินล็อกอินอยู่จะเห็นแค่ลิงก์ "หลังบ้าน" ไม่เห็นเมนูผู้ใช้</li>
+    <li><b>ProtectedRoute</b> — <code class="inline">requireAdmin</code> + ยังไม่ล็อกอิน → เด้งไป <code class="inline">/admin/login</code> (หน้าผู้ใช้ธรรมดาเด้งไป <code class="inline">/login</code>) พร้อมจำหน้าที่ตั้งใจไว้ (state.from)</li>
+  </ul>
+</section>
+
+<!-- ═══ 9 FE Context ═══ -->
+<section id="fe-context">
+  <div class="doc-kicker">FRONTEND · STATE</div>
+  <h1>9. AuthContext + Services — ศูนย์กลางสถานะล็อกอิน</h1>
+  <div class="files"><span class="file">frontend/src/context/AuthContext.tsx</span><span class="file">services/authService.ts</span><span class="file">services/api.ts</span></div>
+<pre class="code"><span class="cm">// services/api.ts — axios instance กลาง</span>
+<span class="kw">export const</span> API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? <span class="st">"http://localhost:4000/api/v1"</span>;
+<span class="kw">export const</span> TOKEN_STORAGE_KEY = <span class="st">"booking_token"</span>;
+<span class="kw">const</span> api = axios.<span class="fn">create</span>({ baseURL: API_BASE_URL });
+api.interceptors.request.<span class="fn">use</span>((config) => {
+  <span class="kw">const</span> token = localStorage.<span class="fn">getItem</span>(TOKEN_STORAGE_KEY);
+  <span class="kw">if</span> (token) config.headers.Authorization = `Bearer ${token}`;   <span class="cm">// แนบ token ทุก request อัตโนมัติ</span>
+  <span class="kw">return</span> config;
+});</pre>
+  <p><b>AuthContext</b> รวมทุกการยืนยันตัวตนไว้ที่เดียว ทุกหน้าเรียกผ่าน <code class="inline">useAuth()</code>:</p>
+<pre class="code"><span class="kw">const</span> login      = <span class="fn">useCallback</span>(<span class="kw">async</span> (email, password) => {        <span class="cm">// หน้าผู้ใช้</span>
+  <span class="kw">const</span> { token, user } = <span class="kw">await</span> authService.<span class="fn">login</span>({ email, password });
+  localStorage.<span class="fn">setItem</span>(TOKEN_STORAGE_KEY, token);                  <span class="cm">// เก็บ token</span>
+  setUser(user); <span class="kw">return</span> user;
+}, []);
+
+<span class="kw">const</span> adminLogin = <span class="fn">useCallback</span>(<span class="kw">async</span> (email, password) => {        <span class="cm">// หน้าหลังบ้าน</span>
+  <span class="kw">const</span> { token, user } = <span class="kw">await</span> authService.<span class="fn">adminLogin</span>({ email, password });
+  localStorage.<span class="fn">setItem</span>(TOKEN_STORAGE_KEY, token);
+  setUser(user); <span class="kw">return</span> user;
+}, []);
+
+<span class="cm">// ตอนเปิดเว็บ: มี token ค้าง → ยิง GET /auth/me ตรวจ → ได้ user จริงจาก DB</span>
+<span class="cm">// token หมด/ปลอม → ลบทิ้ง กลับเป็น guest อัตโนมัติ</span></pre>
+  <div class="note"><b>จุดเด่น:</b> แยก <code class="inline">login</code> กับ <code class="inline">adminLogin</code> เป็นสองฟังก์ชันชัดเจน — หน้าไหนใช้ปุ่มไหน ยิง endpoint ถูกทางเสมอ และทุกหน้าที่ต้องล็อกอินอ่านสถานะจาก context เดียว ไม่กระจัดกระจาย</div>
+</section>
+
+<!-- ═══ 10 FE Layout/UX ═══ -->
+<section id="fe-layout">
+  <div class="doc-kicker">FRONTEND · UX</div>
+  <h1>10. UX ที่ปรับแต่งสำคัญ</h1>
+
+  <h3>10.1 กล่องยืนยันก่อนลบถาวร — ConfirmDialog</h3>
+  <div class="files"><span class="file">frontend/src/components/ConfirmDialog.tsx</span></div>
+  <p>แทน <code class="inline">window.confirm</code> ของเบราว์เซอร์ด้วย modal ของระบบเอง — พื้นหลังมืดลง, ไอคอน ⚠️, หมายเหตุอยู่ในกรอบแดงเด่นชัด กด Esc/คลิกนอกกล่อง = ยกเลิก และระหว่างกำลังทำงานปุ่มทุกปุ่มถูกล็อก กันดับเบิลคลิก:</p>
+<pre class="code">&lt;<span class="fn">ConfirmDialog</span>
+  title={t(<span class="st">"account.deleteConfirmTitle"</span>)}
+  message={t(<span class="st">"account.deleteConfirmWarning"</span>)}   <span class="cm">// หมายเหตุเตือน อ่านก่อนกด</span>
+  confirmLabel={t(<span class="st">"account.deleteConfirmYes"</span>)}
+  isConfirming={isDeletingAccount}
+  confirmingLabel={t(<span class="st">"account.deleting"</span>)}        <span class="cm">// ข้อความปุ่มขณะกำลังลบ</span>
+  onConfirm={() =&gt; <span class="kw">void</span> handleDeleteAccount()}
+  onCancel={() => setIsDeleteDialogOpen(<span class="kw">false</span>)}
+/&gt;</pre>
+
+  <h3>10.2 แถบเมนูล้น — บั๊ก flex คลาสสิก</h3>
+  <div class="warn"><b>ปัญหาที่เคยเกิด:</b> เมนูใช้ <code class="inline">overflow-x-auto + justify-center</code> — เมื่อเมนูล้น ของที่ถูก center จะ<b>หลุดไปนอกพื้นที่ scroll สองฝั่ง</b> และเมาส์เลื่อนแนวนอนไม่ได้ (ต้องกด Shift) เลยเหมือนเมนูหาย/กดไม่ได้ <b>วิธีแก้:</b> เปลี่ยนเป็น <code class="inline">flex-wrap</code> — เมนูล้นตัดขึ้นบรรทัดใหม่เอง ทุกเมนูมองเห็นและกดได้เสมอ</div>
+
+  <h3>10.3 หน้าล็อกอินหลังบ้าน — AdminLoginPage</h3>
+  <div class="files"><span class="file">frontend/src/pages/AdminLoginPage.tsx</span></div>
+  <ul>
+    <li>ธีมดำเต็มจอ + โล่ FiShield + ป้ายเหลือง "พื้นที่จำกัดสิทธิ์" — แยกจากหน้าผู้ใช้ชัดเจน</li>
+    <li>ช่องอีเมล<b>กรอกอีเมลกลางไว้ให้แล้ว</b> — แอดมินใส่แค่รหัสผ่านส่วนตัว</li>
+    <li>ล็อกอินแอดมินค้างอยู่แล้วแล้วเปิดหน้านี้ → เด้งเข้า /admin ทันที (ไม่ถามซ้ำ)</li>
+    <li>backend ปฏิเสธ (403/401) → ข้อความเตือนโชว์ในการ์ดด้วย Alert</li>
+  </ul>
+</section>
+
+<!-- ═══ 11 FE Ticket ═══ -->
+<section id="fe-ticket">
+  <div class="doc-kicker">FRONTEND · TICKET</div>
+  <h1>11. บัตรคอนเสิร์ต — รหัสครบ / QR ครบ / VAT / ใบเสร็จ</h1>
+  <div class="files"><span class="file">frontend/src/components/TicketCard.tsx</span><span class="file">utils/format.ts</span><span class="file">utils/receipt.ts</span></div>
+
+  <h3>11.1 รหัสตั๋วรายที่นั่ง — เรียงแนวนอน + เลขที่นั่งในวงเล็บ</h3>
+<pre class="code"><span class="cm">// ซื้อหลายใบ → ต่อท้ายด้วยเลขที่นั่งในวงเล็บ เช่น THAST08T5K(08) THAST09N3R(09)</span>
+<span class="kw">const</span> entries = seatTickets
+  .<span class="fn">map</span>((seat) => ({ ticketCode: seat.ticketCode, seatNo: <span class="fn">seatNumberFrom</span>(seat.code) }))  <span class="cm">// "A08" → "08"</span>
+  .<span class="fn">filter</span>((e) => Boolean(e.ticketCode));
+<span class="kw">if</span> (entries.length === 0) entries.<span class="fn">push</span>({ ticketCode, seatNo: <span class="st">""</span> });   <span class="cm">// fallback</span>
+<span class="kw">const</span> showSeatNumbers = entries.length > 1;                          <span class="cm">// ★ วงเล็บเฉพาะซื้อหลายใบ</span>
+<span class="kw">const</span> displayCodes = entries.<span class="fn">map</span>((e) =>
+  showSeatNumbers && e.seatNo ? `${e.ticketCode}(${e.seatNo})` : e.ticketCode);
+
+<span class="cm">// QR — รหัสบัตรครบทุกใน คั่นด้วยช่องว่าง (สแกนแล้วเห็นทุกใน ไม่ใช่แค่ใบแรก)</span>
+<span class="kw">const</span> qrValue = entries.length > 0
+  ? entries.<span class="fn">map</span>((e) => e.ticketCode).<span class="fn">join</span>(<span class="st">" "</span>) : ticketCode;</pre>
+
+  <h3>11.2 VAT 7% — ราคารวมภาษี แยกย่อยออกมาแสดง</h3>
+  <div class="files"><span class="file">frontend/src/utils/format.ts</span></div>
+<pre class="code"><span class="kw">export const</span> VAT_RATE = 0.07;
+<span class="kw">export const</span> <span class="fn">calculateVat</span> = (totalWithVat: number): VatBreakdown => {
+  <span class="kw">const</span> total     = Math.<span class="fn">round</span>(totalWithVat * 100) / 100;
+  <span class="kw">const</span> beforeVat = Math.<span class="fn">round</span>((total / (1 + VAT_RATE)) * 100) / 100;   <span class="cm">// ย้อนหายอดก่อน VAT</span>
+  <span class="kw">return</span> { beforeVat, vat: Math.<span class="fn">round</span>((total - beforeVat) * 100) / 100, total };
+};</pre>
+  <p>บัตรคอนเสิร์ตและหน้าชำระเงินจะแสดง 3 บรรทัด: <b>ยอดก่อน VAT (7%) → ภาษีมูลค่าเพิ่ม (VAT 7%) → ยอดรวม</b> พร้อมหมายเหตุ "ราคารวม VAT 7% แล้ว" — คำนวณจากฟังก์ชันกลางเดียว ตัวเลขตรงกันทุกจุด</p>
+
+  <h3>11.3 พิมพ์ใบเสร็จรับเงิน — utils/receipt.ts</h3>
+<pre class="code"><span class="kw">export const</span> <span class="fn">printReceipt</span> = (data: ReceiptData): <span class="kw">void</span> => {
+  <span class="kw">const</span> vat = <span class="fn">calculateVat</span>(data.totalPrice);
+  <span class="kw">const</span> html = `&lt;!DOCTYPE html&gt;...ใบเสร็จ HTML สไตล์ตั๋ว 320px...
+    ยอดก่อน VAT (7%): ${formatCurrency(vat.beforeVat)}
+    ภาษีมูลค่าเพิ่ม (VAT 7%): ${formatCurrency(vat.vat)}
+    ยอดรวมสุทธิ (รวม VAT 7%): ${formatCurrency(vat.total)}...`;
+
+  <span class="kw">const</span> win = window.<span class="fn">open</span>(<span class="st">""</span>, <span class="st">"_blank"</span>, <span class="st">"width=420,height=680"</span>);
+  <span class="kw">if</span> (!win) <span class="kw">return</span>;                       <span class="cm">// ผู้ใช้บล็อกป๊อปอัป</span>
+  win.document.<span class="fn">open</span>(); win.document.<span class="fn">write</span>(html);
+  win.document.<span class="fn">close</span>(); win.<span class="fn">focus</span>(); win.<span class="fn">print</span>();   <span class="cm">// เปิดแล้วสั่งพิมพ์ทันที</span>
+};</pre>
+  <p>ใบเสร็จมี: เลขที่ใบเสร็จ (= รหัสตั๋ว), วันที่ออก, ผู้ซื้อ, รายการบัตร + โซน/ที่นั่ง/<b>รหัสตั๋วรายที่นั่งครบทุกใน</b>, ยอดก่อน VAT, VAT 7%, ยอดรวมสุทธิ และคำว่า "ราคารวมภาษีมูลค่าเพิ่ม 7% แล้ว" — ปุ่มพิมพ์อยู่ใต้บัตรบนหน้า "ตั๋วของฉัน" เฉพาะการจองสถานะ COMPLETED</p>
+</section>
+
+<!-- ═══ 12 FE Duty/Admin ═══ -->
+<section id="fe-duty">
+  <div class="doc-kicker">FRONTEND · ADMIN PAGES</div>
+  <h1>12. ระบบเวร + หน้าจัดการแอดมิน (AdminStaffPage)</h1>
+  <div class="files"><span class="file">frontend/src/components/AdminDutyPanel.tsx</span><span class="file">pages/AdminStaffPage.tsx</span></div>
+
+  <h3>12.1 AdminDutyPanel — แสดง "ใช้งานในชื่อ..." + เปลี่ยนผู้ทำงาน</h3>
+  <p>มี 2 โหมดใน component เดียว: ถ้ามีเวรเปิดอยู่ → แสดงแถบ <b>"ใช้งานในชื่อ ชื่อ (รหัส)"</b> พร้อมปุ่มเปลี่ยนผู้ทำงาน; ถ้าไม่มีเวร → เข้าโหมดเลือก (โหลดรายชื่อแอดมินจาก <code class="inline">GET /admin/staff</code> ค่าเริ่มต้นเลือกบัญชีที่ล็อกอินอยู่ มีป้าย "ล็อกอินอยู่" กำกับ) แล้วกดยืนยันเริ่มเวร:</p>
+<pre class="code"><span class="kw">const</span> handleConfirm = <span class="kw">async</span> (): <span class="kw">Promise</span>&lt;<span class="kw">void</span>&gt; => {
+  <span class="kw">const</span> updated = <span class="kw">await</span> adminService.<span class="fn">setTodayDuty</span>(selectedId);   <span class="cm">// POST /admin/staff/duty</span>
+  onDutyUpdated(updated);                                        <span class="cm">// แจ้ง parent ให้อัปเดต state</span>
+  setIsChanging(<span class="kw">false</span>);
+};</pre>
+  <p>แผนนี้ถูกวางบน <b>AdminPaymentsPage</b> (หน้าตรวจสลิป) — ผู้ตรวจเห็นตัวเองตลอดขณะทำงาน และรายการอนุมัติแล้วแสดง "อนุมัติโดย รหัส admin0002 (ชื่อ)" จากข้อมูล <code class="inline">reviewedBy.employeeId</code> ที่ backend ส่งมา</p>
+
+  <h3>12.2 AdminStaffPage — ประตูรหัสลับ + เพิ่ม/ลด</h3>
+  <p>เพจนี้มี 2 ขั้นในไฟล์เดียว:</p>
+<pre class="code"><span class="cm">// ขั้น 1 — Gate: ยังไม่ปลดล็อก บล็อกทั้งหน้า (ไม่เห็นฟอร์ม/รายชื่อเลย)</span>
+<span class="kw">const</span> [accessCode, setAccessCode] = useState&lt;string | <span class="kw">null</span>&gt;(<span class="kw">null</span>);
+<span class="kw">if</span> (!accessCode) <span class="kw">return</span> (
+  &lt;...ฟอร์มใส่รหัส 8 ตัว (maxLength 4+4) ... กดยืนยัน → verifyStaffAccess(code)&gt;
+);                                          <span class="cm">// ผิด = ค้างหน้านี้ + ข้อความ 403 จาก backend</span>
+
+<span class="cm">// ขั้น 2 — ปลดล็อกแล้ว: ฟอร์มเพิ่ม + รายชื่อ + ปุ่มลบ (accessCode เก็บใน state เท่านั้น)</span>
+<span class="cm">// → ออกจากหน้า/รีเฟรช = ต้องใส่รหัสใหม่ทุกครั้ง ตามข้อกำหนด</span></pre>
+  <ul>
+    <li><b>รหัสพนักงาน:</b> ช่องกรอกกรองให้เหลือแค่ตัวเลขทันทีที่พิมพ์ (<code class="inline">value.replace(/\D/g,"").slice(0,4)</code>) — Zod ตรวจซ้ำอีกชั้น <code class="inline">/^\d{4}$/</code> ทั้ง client และ server</li>
+    <li><b>พรีวิวอีเมลสด:</b> พิมพ์รหัสเมื่อไร กล่องม่วงแสดง <code class="inline">admin{รหัส}@concerthub.dev</code> ทันทีก่อนกดบันทึก</li>
+    <li><b>ลดแอดมิน:</b> ปุ่มลบแต่ละแถว → ConfirmDialog เตือนลบถาวร → เรียก <code class="inline">POST /admin/staff/remove</code> พร้อมแนบ accessCode แล้วโหลดรายชื่อใหม่จาก DB (ลิสต์ตรง DB เสมอ)</li>
+  </ul>
+</section>
+
+<!-- ═══ 13 FE Dialog ═══ -->
+<section id="fe-dialog">
+  <div class="doc-kicker">FRONTEND · ACCOUNT</div>
+  <h1>13. ลบบัญชีตัวเอง — มีเงื่อนไขและมีการยืนยัน</h1>
+  <div class="files"><span class="file">frontend/src/pages/MyBookingsPage.tsx</span></div>
+  <p>โซนอันตรายท้ายหน้า "ตั๋วของฉัน" — กดปุ่มลบบัญชีไม่ลบทันที แต่เปิด ConfirmDialog ที่มีหมายเหตุว่า "ข้อมูลจะถูกลบถาวร + หากยังมีบัตรไม่หมดอายุ ระบบจะไม่อนุญาตให้ลบ" — กดยืนยันจึงเรียก <code class="inline">DELETE /auth/me</code>:</p>
+<pre class="code"><span class="kw">const</span> handleDeleteAccount = <span class="kw">async</span> (): <span class="kw">Promise</span>&lt;<span class="kw">void</span>&gt; => {
+  setIsDeletingAccount(<span class="kw">true</span>);
+  <span class="kw">try</span> {
+    <span class="kw">await</span> deleteAccount();                       <span class="cm">// ถ้ามีบัตรค้าง → backend 409 พร้อมข้อความบอกจำนวน</span>
+    navigate(<span class="st">"/"</span>, { replace: <span class="kw">true</span> });
+  } <span class="kw">catch</span> (err) {
+    setError(getApiErrorMessage(err));           <span class="cm">// โชว์เหตุผลที่ลบไม่ได้บนหน้าเว็บ</span>
+    setIsDeleteDialogOpen(<span class="kw">false</span>);
+  } <span class="kw">finally</span> { setIsDeletingAccount(<span class="kw">false</span>); }
+};</pre>
+  <p>เงื่อนไข "บัตรหมดอายุ" ตัดสินที่ backend (สถานะ ≠ CANCELLED และ showDate ≥ วันนี้) — ผู้ใช้เลี่ยงด้วยเครื่องมือใดไม่ได้ เพราะเป็นการนับจากฐานข้อมูลจริงทุกครั้ง</p>
+</section>
+
+<!-- ═══ 14 API ═══ -->
+<section id="api">
+  <div class="doc-kicker">REFERENCE</div>
+  <h1>14. ตาราง API ทั้งหมด (ฐาน /api/v1)</h1>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>สิทธิ์</th><th>หน้าที่</th></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/auth/register</td><td>สาธารณะ</td><td>สมัครสมาชิก (ตรวจ checksum บัตร + ข้อมูลซ้ำ) → USER เสมอ</td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/auth/login</td><td>สาธารณะ</td><td>ล็อกอินหน้าผู้ใช้ — <b>แอดมินโดน 403</b></td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/auth/admin/login</td><td>สาธารณะ</td><td>ล็อกอินหลังบ้าน (อีเมลกลาง + รหัสส่วนตัว) — USER โดน 403 + ตั้งเวรอัตโนมัติ</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/auth/me</td><td>ล็อกอิน</td><td>ข้อมูลผู้ใช้ปัจจุบัน (ตรวจ token)</td></tr>
+    <tr><td><span class="badge b-del">DELETE</span></td><td>/auth/me</td><td>ล็อกอิน</td><td>ลบบัญชี — <b>409 ถ้ามีบัตรไม่หมดอายุ</b></td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/concerts · /concerts/:id</td><td>สาธารณะ</td><td>รายการคอนเปิดขาย / รายละเอียด+ผังโซน</td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/bookings</td><td>USER</td><td>จองที่นั่ง (SERIALIZABLE + รหัสตั๋วรายที่นั่ง)</td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/bookings/:id/slip</td><td>USER</td><td>แนบสลิป → PENDING_VERIFICATION</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/bookings/my-bookings</td><td>ล็อกอิน</td><td>การจองของฉัน (พร้อมรหัสตั๋วรายที่นั่ง)</td></tr>
+    <tr><td><span class="badge b-patch">PATCH</span></td><td>/bookings/:id/cancel</td><td>USER</td><td>ยกเลิก — คืนที่นั่งทันที</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/bookings/check/:id</td><td>สาธารณะ</td><td>ตรวจสถานะตั๋วด้วยรหัสจอง</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/admin/stats · /admin/concerts · /admin/bookings · /admin/payments</td><td>ADMIN</td><td>สถิติ / คอนทุกสถานะ / การจองทั้งหมด / สลิป (มี reviewedBy รหัสผู้ตรวจ)</td></tr>
+    <tr><td><span class="badge b-patch">PATCH</span></td><td>/admin/payments/:id/approve · /reject</td><td>ADMIN</td><td>อนุมัติ/ปฏิเสธ — บันทึก reviewedBy + คืนรหัสผู้ตรวจ</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/admin/staff</td><td>ADMIN</td><td>รายชื่อแอดมินทั้งหมด</td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/admin/staff</td><td>ADMIN</td><td>เพิ่มแอดมิน (ต้องแนบ accessCode — อีเมลสร้างอัตโนมัติ)</td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/admin/staff/verify-access</td><td>ADMIN</td><td>ตรวจรหัสลับ 8 ตัวก่อนเข้าหน้าจัดการแอดมิน</td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/admin/staff/remove</td><td>ADMIN</td><td>ลบบัญชีแอดมิน (ห้ามลบตัวเอง + ต้องแนบ accessCode)</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/admin/staff/duty/today</td><td>ADMIN</td><td>ใครอยู่เวรวันนี้ (null = ยังไม่มี)</td></tr>
+    <tr><td><span class="badge b-post">POST</span></td><td>/admin/staff/duty</td><td>ADMIN</td><td>ตั้งผู้อยู่เวร (ปิดเวรเดิมอัตโนมัติ)</td></tr>
+    <tr><td><span class="badge b-patch">PATCH</span></td><td>/concerts/:id · /sale-status · /zones</td><td>ADMIN</td><td>แก้คอน / เปิด-ปิดขาย / ราคา-เปิดขายรายโซน</td></tr>
+    <tr><td><span class="badge b-del">DELETE</span></td><td>/concerts/:id</td><td>ADMIN</td><td>ลบคอนเฉพาะแบบร่าง</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/admin/concerts/:id/seats · /tickets · /summary</td><td>ADMIN</td><td>ผังเรียลไทม์ / ตั๋วรายการ / สรุปรายได้</td></tr>
+    <tr><td><span class="badge b-get">GET</span></td><td>/admin/notifications · PATCH /read</td><td>ADMIN</td><td>แจ้งเตือนบัตรหมด (รายโซน/ทั้งคอน)</td></tr>
+  </table>
+</section>
+
+<!-- ═══ 15 Seed ═══ -->
+<section id="seed">
+  <div class="doc-kicker">DEMO DATA</div>
+  <h1>15. Seed ข้อมูลเดโม่ (prisma/seed.ts)</h1>
+  <p>รันด้วย <code class="inline">npm run prisma:seed</code> — ข้ามส่วนที่มีข้อมูลอยู่แล้วอัตโนมัติ ถ้าอยากรีเซ็ตเดโม่ใหม่ทั้งหมด: รัน <code class="inline">node reset-demo.cjs</code> (ล้างคอน/การจอง) แล้ว seed ซ้ำ</p>
+  <ul>
+    <li><b>แอดมิน 4 คน</b> — อภิชาติ(0000)/Admin1234 · สมชาย(0001)/Admin0001 · สมหญิง(0002)/Staff1234 · มาลี(0003)/Admin0003 — รหัสผ่านทุกคนไม่ซ้ำกัน (เงื่อนไขอีเมลกลาง)</li>
+    <li><b>ลูกค้า 5 คน</b> — user@concerthub.dev · somchai · malee · prakan · nok (รหัสผ่าน User1234 ทั้งหมด, โปรไฟล์ครบ)</li>
+    <li><b>คอนเสิร์ต 7 งาน</b> — ครบ THAI/INTL × SOLO/GROUP + สถานะ OPEN 5 · DRAFT 1 · SOLD_OUT 1 (ซิมโฟนีออฟไฟร์เวิร์คส์ — ที่นั่งทุกโซนถือหมด)</li>
+    <li><b>การจอง 6 กรณีศึกษา</b> — COMPLETED+สลิปอนุมัติ(ผู้ตรวจ admin0001) · PENDING_VERIFICATION · REJECTED(พร้อมเหตุผล) · PENDING · CANCELLED · จองบนคอนบัตรหมด — แต่ละรายการมี BookingSeat + รหัสตั๋วรายที่นั่งจริงตามรูปแบบ THAVP/A08...</li>
+  </ul>
+  <div class="note"><b>รูปแบบรหัสตั๋วใน seed:</b> {THA|NAT} + รหัสโซน + <b>seat.code</b> (แถว+เลข เช่น A08) + เลข 2 ตัว — ใช้ seat.code แทน seatNumber เพราะ seatNumber เริ่มนับ 1 ใหม่ทุกแถว จะซ้ำข้ามแถว (เช่น THAVPA0852, THAVPB0852)</div>
+</section>
+
+<!-- ═══ 16 Run ═══ -->
+<section id="run">
+  <div class="doc-kicker">HOW TO RUN</div>
+  <h1>16. วิธีรันโปรเจกต์</h1>
+<pre class="code"><span class="cm"># Backend (port 4000)</span>
+<span class="kw">cd</span> "Project Concert Booking/backend"
+npm install
+npx prisma generate            <span class="cm"># สร้าง Prisma Client จาก schema</span>
+npx prisma migrate deploy      <span class="cm"># สร้าง/อัปเดตตารางตาม migrations</span>
+npm run prisma:seed            <span class="cm"># ข้อมูลเดโม่ (ครั้งแรกหรืออยากรีข้อมูล)</span>
+npm run dev                    <span class="cm"># nodemon + ts-node</span>
+
+<span class="cm"># Frontend (port 5173)</span>
+<span class="kw">cd</span> "Project Concert Booking/frontend"
+npm install
+npm run dev                    <span class="cm"># vite</span></pre>
+  <p>ตัวแปรใน <code class="inline">backend/.env</code> ที่ปรับได้: <code class="inline">DATABASE_URL</code> · <code class="inline">JWT_SECRET</code> · <code class="inline">ADMIN_EMAIL_DOMAIN</code> (concerthub.dev) · <code class="inline">ADMIN_ACCESS_CODE</code> (Main0110) · <code class="inline">ADMIN_LOGIN_EMAIL</code> (admin@concerthub.dev)</p>
+  <table>
+    <tr><th>พื้นที่</th><th>URL</th><th>บัญชี</th></tr>
+    <tr><td>เว็บผู้ใช้</td><td>localhost:5173/login</td><td>user@concerthub.dev / User1234</td></tr>
+    <tr><td>หลังบ้าน</td><td>localhost:5173/admin/login</td><td>อีเมลกลาง admin@concerthub.dev + รหัสผ่านส่วนตัว (เช่น Admin1234)</td></tr>
+  </table>
+</section>
+
+<p class="sub" style="text-align:center; padding-bottom:40px;">— จบเอกสาร · BOOKING TICKET CONCERT · CE385 —</p>
+</div>
+
+<div class="top"><button onclick="window.scrollTo({top:0, behavior:'smooth'})" title="กลับขึ้นบน">↑</button></div>
+
+<script>
+  // ไฮไลต์ลิงก์ sidebar ตาม section ที่กำลังดู
+  const links = [...document.querySelectorAll(".sidebar a")];
+  const sections = links.map((a) => document.querySelector(a.getAttribute("href")));
+  window.addEventListener("scroll", () => {
+    let current = 0;
+    sections.forEach((sec, i) => {
+      if (sec && sec.getBoundingClientRect().top <= 120) current = i;
+    });
+    links.forEach((a, i) => a.classList.toggle("active", i === current));
+  });
+</script>
+</body>
+</html>

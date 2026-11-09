@@ -4,6 +4,7 @@ import { FiArrowRight, FiCalendar, FiMapPin, FiMusic } from "react-icons/fi";
 
 import { useAuth } from "../context/AuthContext";
 import { concertDisplayName } from "../i18n";
+import { getUploadUrl } from "../services/api";
 import type { Concert } from "../types";
 import { formatCurrency, formatDateBadge, formatDateRange } from "../utils/format";
 import { getConcertSeatsLeft, getConcertStartingPrice, isConcertSoldOut } from "../utils/concert";
@@ -33,7 +34,7 @@ export default function ConcertCard({ concert }: ConcertCardProps) {
         {hasImage ? (
           <>
             <img
-              src={concert.imageUrl ?? ""}
+              src={getUploadUrl(concert.imageUrl ?? "")}
               alt={`Cover of ${concertDisplayName(concert)}`}
               className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />

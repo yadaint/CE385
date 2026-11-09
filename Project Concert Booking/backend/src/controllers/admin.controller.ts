@@ -1,10 +1,15 @@
 import type { BookingStatus, PaymentStatus } from "@prisma/client";
 import type { Request, Response } from "express";
+import bcrypt from "bcryptjs";
 
+import { env } from "../config/env";
 import { AppError } from "../errors/AppError";
 import { prisma } from "../lib/prisma";
+import type { CreateStaffInput } from "../schemas/auth.schema";
 import { withFlatSeats } from "./booking.controller";
 import { asyncHandler } from "../utils/asyncHandler";
+
+const BCRYPT_SALT_ROUNDS = 12;
 
 const CONCERT_SUMMARY_FIELDS = {
   id: true,
@@ -523,7 +528,9 @@ export const getAllPayments = asyncHandler(
       where: status ? { status } : undefined,
       orderBy: [{ status: "asc" }, { createdAt: "asc" }],
       include: {
-        reviewer: { select: { id: true, email: true } },
+        reviewer: {
+          select: { id: true, email: true, employeeId: true, firstName: true, lastName: true },
+        },
         booking: {
           include: {
             user: { select: { email: true } },
@@ -584,11 +591,17 @@ export const approvePayment = asyncHandler(
       return { payment: approved, booking };
     });
 
+    // ดึงข้อมูลแอดมินผู้ตรวจ เพื่อบันทึกว่า "รหัสแอดมินคนไหน" เป็นคนกดยืนยัน
+    const reviewer = await prisma.user.findUnique({
+      where: { id: adminId },
+      select: { id: true, email: true, employeeId: true, firstName: true, lastName: true },
+    });
+
     res.status(200).json({
       success: true,
-      message: "อนุมัติการชำระเงินสำเร็จ — บัตรจองสำเร็จแล้ว",
+      message: `อนุมัติการชำระเงินสำเร็จ — บัตรจองสำเร็จแล้ว (ผู้ตรวจ: แอดมินรหัส ${reviewer?.employeeId ?? "-"})`,
       data: {
-        payment: { ...result.payment, reviewedByEmail: req.user!.email },
+        payment: { ...result.payment, reviewedBy: reviewer },
         booking: result.booking,
       },
     });
@@ -625,13 +638,234 @@ export const rejectPayment = asyncHandler(
       return { payment: rejected, booking };
     });
 
+    // ดึงข้อมูลแอดมินผู้ตรวจ เพื่อบันทึกว่า "รหัสแอดมินคนไหน" เป็นคนปฏิเสธ
+    const reviewer = await prisma.user.findUnique({
+      where: { id: adminId },
+      select: { id: true, email: true, employeeId: true, firstName: true, lastName: true },
+    });
+
     res.status(200).json({
       success: true,
-      message: "ปฏิเสธสลิปสำเร็จ — ผู้จองสามารถส่งสลิปใหม่ได้",
+      message: `ปฏิเสธสลิปสำเร็จ — ผู้จองสามารถส่งสลิปใหม่ได้ (ผู้ตรวจ: แอดมินรหัส ${reviewer?.employeeId ?? "-"})`,
       data: {
-        payment: { ...result.payment, reviewedByEmail: req.user!.email },
+        payment: { ...result.payment, reviewedBy: reviewer },
         booking: result.booking,
       },
     });
   },
 );
+
+/**
+ * GET /api/v1/admin/staff — รายชื่อบัญชีแอดมินทั้งหมด (ใช้ในหน้าเลือกเวร / เพิ่มแอดมิน)
+ */
+export const getStaffList = asyncHandler(
+  async (_req: Request, res: Response): Promise<void> => {
+    const staff = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      orderBy: [{ employeeId: "asc" }, { createdAt: "asc" }],
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        employeeId: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json({ success: true, data: { staff } });
+  },
+);
+
+/**
+ * GET /api/v1/admin/staff/duty/today — ใครกำลังอยู่เวรวันนี้ (endedAt = null และ workDate = วันนี้)
+ * คืน null ถ้ายังไม่มีใครเลือกเวรวันนี้ (หน้าเว็บจะบังคับให้เลือกก่อนใช้หลังบ้าน)
+ */
+export const getTodayDuty = asyncHandler(
+  async (_req: Request, res: Response): Promise<void> => {
+    const now = new Date();
+    const rangeStart = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    const rangeEnd = new Date(rangeStart);
+    rangeEnd.setUTCDate(rangeEnd.getUTCDate() + 1);
+
+    const duty = await prisma.staffDuty.findFirst({
+      where: { workDate: { gte: rangeStart, lt: rangeEnd }, endedAt: null },
+      orderBy: { startedAt: "desc" },
+      include: {
+        staff: {
+          select: { id: true, email: true, firstName: true, lastName: true, employeeId: true },
+        },
+      },
+    });
+
+    res.status(200).json({ success: true, data: { duty } });
+  },
+);
+
+/**
+ * POST /api/v1/admin/staff/duty — เลือกแอดมินประจำเวรวันนี้ (ทำหลังล็อกอิน)
+ * ปิดเวรเก่าที่ยังค้างอยู่ให้หมด แล้วเปิดเวรใหม่ของคนที่ถูกเลือกทันที
+ */
+export const setTodayDuty = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { staffId } = req.body as { staffId: string };
+
+  const staff = await prisma.user.findUnique({ where: { id: staffId } });
+  if (!staff || staff.role !== "ADMIN") {
+    throw new AppError("ไม่พบบัญชีแอดมินนี้ในระบบ", 404);
+  }
+
+  const now = new Date();
+  const workDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12));
+
+  const [closedResult] = await prisma.$transaction([
+    // 1) ปิดทุกเวรที่ยังเปิดค้าง (ไม่ว่าจะวันไหน) — คนเดิมเลิกงาน/สลับเวร
+    prisma.staffDuty.updateMany({ where: { endedAt: null }, data: { endedAt: now } }),
+    // 2) เปิดเวรใหม่ของคนที่ถูกเลือก
+    prisma.staffDuty.create({
+      data: { staffId, workDate, startedAt: now },
+      include: {
+        staff: {
+          select: { id: true, email: true, firstName: true, lastName: true, employeeId: true },
+        },
+      },
+    }),
+  ]);
+  const closedCount = closedResult.count;
+
+  // transaction ปิดเวรเก่าแล้ว — ดึงเวรใหม่ที่เพิ่งสร้างมาพร้อมข้อมูลแอดมินเพื่อตอบกลับ
+  const duty = await prisma.staffDuty.findFirst({
+    where: { staffId, workDate, endedAt: null },
+    orderBy: { startedAt: "desc" },
+    include: {
+      staff: {
+        select: { id: true, email: true, firstName: true, lastName: true, employeeId: true },
+      },
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: `${staff.firstName ?? staff.email} เริ่มเวรวันนี้แล้ว (ปิดเวรเดิม ${closedCount} รายการ)`,
+    data: { duty },
+  });
+});
+
+/**
+ * ตรวจรหัสยืนยันการจัดการแอดมิน — รหัสผิด = 403 (ไม่มีสิทธิ์เพิ่มหรือลดแอดมิน)
+ * รหัสฟิคไว้ที่ env.ADMIN_ACCESS_CODE (Main0110) และต้องส่งมาใหม่ทุกครั้ง
+ */
+const assertStaffAccess = (accessCode: string): void => {
+  if (accessCode !== env.ADMIN_ACCESS_CODE) {
+    throw new AppError("รหัสยืนยันไม่ถูกต้อง — คุณไม่มีสิทธิ์เพิ่มหรือลดแอดมิน", 403);
+  }
+};
+
+/**
+ * POST /api/v1/admin/staff/verify-access — ตรวจรหัสยืนยัน 8 ตัวก่อนเข้าหน้าจัดการแอดมิน
+ * ใช้ตอนกดเมนู "เพิ่มแอดมิน" — ใส่ผิดจะไม่ปลดล็อกหน้าจอให้เลย
+ */
+export const verifyStaffAccess = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { accessCode } = req.body as { accessCode: string };
+    assertStaffAccess(accessCode);
+
+    res.status(200).json({
+      success: true,
+      message: "รหัสถูกต้อง — เปิดสิทธิ์จัดการแอดมินแล้ว (ปิดหน้านี้ต้องใส่รหัสใหม่ทุกครั้ง)",
+    });
+  },
+);
+
+/**
+ * POST /api/v1/admin/staff/remove — ลบบัญชีแอดมิน (ลดแอดมิน)
+ * ต้องแนบรหัสยืนยันทุกครั้ง ห้ามลบบัญชีของตัวเอง — เวรประจำวัน cascade ลบตามอัตโนมัติ
+ */
+export const removeStaff = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { staffId, accessCode } = req.body as { staffId: string; accessCode: string };
+  assertStaffAccess(accessCode);
+
+  if (staffId === req.user!.id) {
+    throw new AppError("ไม่สามารถลบบัญชีของตัวเองได้ (คุณกำลังล็อกอินอยู่)", 400);
+  }
+
+  const staff = await prisma.user.findUnique({ where: { id: staffId } });
+  if (!staff || staff.role !== "ADMIN") {
+    throw new AppError("ไม่พบบัญชีแอดมินนี้ในระบบ", 404);
+  }
+
+  // ปลดชื่อผู้ตรวจสลิปออกก่อน (กัน FK block) — ประวัติเวร cascade ลบตามความสัมพันธ์ใน schema
+  await prisma.payment.updateMany({ where: { reviewedBy: staffId }, data: { reviewedBy: null } });
+  await prisma.user.delete({ where: { id: staffId } });
+
+  res.status(200).json({
+    success: true,
+    message: `ลบบัญชีแอดมิน ${staff.email} สำเร็จ — ข้อมูลทั้งหมดถูกลบถาวรแล้ว`,
+  });
+});
+
+/**
+ * POST /api/v1/admin/staff — เพิ่มบัญชีแอดมินใหม่ (เฉพาะแอดมินที่ล็อกอินอยู่)
+ * อีเมลสร้างอัตโนมัติจากรหัสพนักงาน: admin{รหัส}@ADMIN_EMAIL_DOMAIN เช่น รหัส 0001 → admin0001@concerthub.dev
+ * ตรวจซ้ำเบอร์โทร/รหัสพนักงาน/อีเมลสร้างใหม่ ก่อนบันทึก (บัญชีแอดมินไม่กรอกบัตรประชาชน เพราะไม่ใช้จองบัตร)
+ */
+export const createStaff = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { firstName, lastName, phone, dateOfBirth, employeeId, password, accessCode } =
+    req.body as CreateStaffInput;
+
+  // ตรวจรหัสยืนยันก่อนเป็นอย่างแรก — ผิด = ไม่มีสิทธิ์สร้างบัญชีแอดมินเลย
+  assertStaffAccess(accessCode);
+
+  // อีเมลจากรหัสพนักงาน — รหัสถูก zod บังคับเป็นพิมพ์ใหญ่แล้ว อีเมลเลยเป็นพิมพ์เล็กทั้งหมด
+  const email = `admin${employeeId.toLowerCase()}@${env.ADMIN_EMAIL_DOMAIN}`;
+
+  const [existingPhone, existingEmployee, existingEmail] = await Promise.all([
+    prisma.user.findFirst({ where: { phone } }),
+    prisma.user.findUnique({ where: { employeeId } }),
+    prisma.user.findUnique({ where: { email } }),
+  ]);
+
+  if (existingEmployee) {
+    throw new AppError(`รหัสพนักงาน ${employeeId} ถูกใช้แล้ว (บัญชี ${existingEmployee.email})`, 409);
+  }
+  if (existingPhone) {
+    throw new AppError("เบอร์โทรศัพท์นี้ถูกใช้สมัครไปแล้ว ข้อมูลนี้ใช้ได้ 1 บัญชีเท่านั้น", 409);
+  }
+  if (existingEmail) {
+    throw new AppError(`อีเมล ${email} ถูกใช้งานแล้ว กรุณาใช้รหัสพนักงานอื่น`, 409);
+  }
+
+  // กันรหัสผ่านซ้ำ — ล็อกอินหลังบ้านใช้อีเมลกลางคนเดียวกัน
+  // รหัสผ่านจึงต้องไม่ซ้ำกัน ไม่งั้นระบบจะระบุไม่ได้ว่ารหัสนี้คือแอดมินคนไหน
+  const existingAdmins = await prisma.user.findMany({ where: { role: "ADMIN" } });
+  for (const admin of existingAdmins) {
+    if (await bcrypt.compare(password, admin.password)) {
+      throw new AppError(
+        "รหัสผ่านนี้ซ้ำกับแอดมินที่มีอยู่แล้ว — รหัสผ่านของแอดมินแต่ละคนต้องไม่ซ้ำกัน กรุณาใช้รหัสผ่านอื่น",
+        409,
+      );
+    }
+  }
+
+  const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+
+  const staff = await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      role: "ADMIN",
+      firstName,
+      lastName,
+      phone,
+      dateOfBirth,
+      employeeId,
+    },
+    select: { id: true, email: true, firstName: true, lastName: true, phone: true, employeeId: true },
+  });
+
+  res.status(201).json({
+    success: true,
+    message: `สร้างบัญชีแอดมิน ${firstName} ${lastName} สำเร็จ — อีเมล: ${email}`,
+    data: { staff },
+  });
+});

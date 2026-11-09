@@ -45,6 +45,7 @@ export const saleStatusLabels: Record<ConcertSaleStatus, string> = {
   OPEN: "เปิดขายแล้ว",
   CLOSED: "ปิดขายชั่วคราว",
   SOLD_OUT: "บัตรหมดแล้ว",
+  CANCELLED: "ยกเลิกการขาย",
 };
 
 /** สไตล์ป้ายสถานะเปิดขาย (ใช้สีตามธีมที่เลือก) */
@@ -53,4 +54,5 @@ export const saleStatusBadgeStyles: Record<ConcertSaleStatus, string> = {
   OPEN: "bg-success-bg text-success-text ring-success-border",
   CLOSED: "bg-warn-bg text-warn-text ring-warn-border",
   SOLD_OUT: "bg-danger-bg text-danger-text ring-danger-border",
+  CANCELLED: "bg-danger-bg text-danger-text ring-danger-border",
 };

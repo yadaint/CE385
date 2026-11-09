@@ -38,6 +38,12 @@ export const authService = {
     return data.data;
   },
 
+  /** POST /auth/admin/login — ล็อกอินหลังบ้าน (backend ปฏิเสธบัญชีที่ไม่ใช่ ADMIN ด้วย 403) */
+  async adminLogin(credentials: LoginCredentials): Promise<AuthResponse> {
+    const { data } = await api.post<ApiResponse<AuthResponse>>("/auth/admin/login", credentials);
+    return data.data;
+  },
+
   /** GET /auth/me — validates the stored token and returns the current user */
   async getMe(): Promise<User> {
     const { data } = await api.get<ApiResponse<{ user: User }>>("/auth/me");

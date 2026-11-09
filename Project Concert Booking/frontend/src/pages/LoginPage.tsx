@@ -119,8 +119,8 @@ export default function LoginPage() {
 
           <div className="mt-5 rounded-input bg-surface-2 p-4 text-center text-xs text-muted">
             <p className="font-semibold text-ink">{t("auth.demoTitle")}</p>
-            <p className="mt-1">admin@concerthub.dev / Admin1234 (ADMIN)</p>
-            <p>user@concerthub.dev / User1234 (USER)</p>
+            <p className="mt-1">user@concerthub.dev / User1234 (USER)</p>
+            <p className="mt-1 text-[11px]">* แอดมินเข้าระบบที่ /admin/login (หน้าหลังบ้านแยกต่างหาก)</p>
           </div>
     </AuthShell>
   );

@@ -8,6 +8,7 @@ import {
   FiClock,
   FiLayers,
   FiMapPin,
+  FiPrinter,
   FiTag,
   FiTrash2,
 } from "react-icons/fi";
@@ -15,6 +16,7 @@ import { LuTicket } from "react-icons/lu";
 import { MdOutlineEventSeat } from "react-icons/md";
 
 import Alert from "../components/Alert";
+import ConfirmDialog from "../components/ConfirmDialog";
 import Spinner from "../components/Spinner";
 import TicketCard from "../components/TicketCard";
 import { useAuth } from "../context/AuthContext";
@@ -23,9 +25,8 @@ import { getApiErrorMessage } from "../services/api";
 import { bookingService } from "../services/bookingService";
 import type { Booking } from "../types";
 import { formatCurrency, formatDateTime } from "../utils/format";
-import {
-  bookingStatusBadgeStyles,
-} from "../utils/labels";
+import { bookingStatusBadgeStyles } from "../utils/labels";
+import { printReceipt } from "../utils/receipt";
 
 /** เวลาที่ให้ชำระเงินหลังจอง (ต้องตรงกับหน้าชำระเงิน) */
 const PAYMENT_WINDOW_MS = 10 * 60 * 1000;
@@ -76,6 +77,9 @@ export default function MyBookingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  // โซนอันตราย: ควบคุมกล่องยืนยันลบบัญชี (แสดงหมายเหตุเตือนก่อนลบถาวร)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
     const fetchBookings = async (): Promise<void> => {
@@ -108,6 +112,23 @@ export default function MyBookingsPage() {
       setError(getApiErrorMessage(err));
     } finally {
       setCancellingId(null);
+    }
+  };
+
+  /** ลบบัญชีถาวร — เรียกจากปุ่มยืนยันใน ConfirmDialog เท่านั้น (ผู้ใช้ต้องอ่านหมายเหตุก่อน) */
+  const handleDeleteAccount = async (): Promise<void> => {
+    setIsDeletingAccount(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      await deleteAccount();
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+      setIsDeleteDialogOpen(false);
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -205,22 +226,55 @@ export default function MyBookingsPage() {
               <li key={booking.id} className="flex flex-col gap-3">
                 {/* รูปหน้าตั๋ว — แสดงเมื่อแอดมินอนุมัติสลิปแล้ว (จองสำเร็จ) */}
                 {booking.status === "COMPLETED" && (
-                  <TicketCard
-                    bookingId={booking.id}
-                    ticketCode={booking.ticketCode}
-                    concertName={concertDisplayName(booking.concert)}
-                    venue={booking.concert.venue.name}
-                    dateLabel={formatDateTime(booking.showDate)}
-                    zoneName={booking.zone.name}
-                    seatCodes={booking.seats.map((seat) => seat.code)}
-                    quantity={booking.quantity}
-                    totalPrice={booking.totalPrice}
-                    buyerLabel={
-                      user?.firstName || user?.lastName
-                        ? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
-                        : user?.email
-                    }
-                  />
+                  <>
+                    <TicketCard
+                      bookingId={booking.id}
+                      ticketCode={booking.ticketCode}
+                      concertName={concertDisplayName(booking.concert)}
+                      venue={booking.concert.venue.name}
+                      dateLabel={formatDateTime(booking.showDate)}
+                      zoneName={booking.zone.name}
+                      seatCodes={booking.seats.map((seat) => seat.code)}
+                      seatTickets={booking.seats.map((seat) => ({
+                        code: seat.code,
+                        ticketCode: seat.ticketCode ?? null,
+                      }))}
+                      quantity={booking.quantity}
+                      totalPrice={booking.totalPrice}
+                      buyerLabel={
+                        user?.firstName || user?.lastName
+                          ? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
+                          : user?.email
+                      }
+                    />
+                    {/* ปุ่มพิมพ์ใบเสร็จรับเงิน (แยกยอดก่อน VAT + VAT 7% + ยอดรวม) */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        printReceipt({
+                          receiptNo: booking.ticketCode,
+                          buyerLabel:
+                            user?.firstName || user?.lastName
+                              ? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
+                              : user?.email ?? "-",
+                          concertName: concertDisplayName(booking.concert),
+                          venue: booking.concert.venue.name,
+                          showDateLabel: formatDateTime(booking.showDate),
+                          zoneName: booking.zone.name,
+                          seatTickets: booking.seats.map((seat) => ({
+                            code: seat.code,
+                            ticketCode: seat.ticketCode ?? null,
+                          })),
+                          quantity: booking.quantity,
+                          totalPrice: booking.totalPrice,
+                        })
+                      }
+                      className="flex items-center justify-center gap-2 rounded-btn border border-line bg-surface py-2 text-sm font-semibold text-muted transition hover:border-primary hover:text-primary"
+                    >
+                      <FiPrinter aria-hidden="true" className="text-base" />
+                      {t("myBookings.printReceipt")}
+                    </button>
+                  </>
                 )}
 
                 {/* รายการจอง + การชำระเงิน */}
@@ -383,16 +437,7 @@ export default function MyBookingsPage() {
           <p className="mt-2 text-sm leading-relaxed text-danger-text">{t("account.deleteDesc")}</p>
           <button
             type="button"
-            onClick={async () => {
-              const confirmed = window.confirm(t("account.deleteConfirm"));
-              if (!confirmed) return;
-              try {
-                await deleteAccount();
-                navigate("/", { replace: true });
-              } catch (err) {
-                setError(getApiErrorMessage(err));
-              }
-            }}
+            onClick={() => setIsDeleteDialogOpen(true)}
             disabled={isLoading}
             className="mt-4 inline-flex items-center gap-2 rounded-btn bg-danger-text px-5 py-2.5 text-sm font-bold text-surface shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -406,6 +451,20 @@ export default function MyBookingsPage() {
           )}
         </section>
       </div>
+
+      {/* กล่องยืนยันลบบัญชี — แสดงหมายเหตุเตือนให้อ่านก่อนกดยืนยันลบถาวร */}
+      {isDeleteDialogOpen && (
+        <ConfirmDialog
+          title={t("account.deleteConfirmTitle")}
+          message={t("account.deleteConfirmWarning")}
+          confirmLabel={t("account.deleteConfirmYes")}
+          cancelLabel={t("account.deleteConfirmNo")}
+          isConfirming={isDeletingAccount}
+          confirmingLabel={t("account.deleting")}
+          onConfirm={() => void handleDeleteAccount()}
+          onCancel={() => setIsDeleteDialogOpen(false)}
+        />
+      )}
     </div>
   );
 }

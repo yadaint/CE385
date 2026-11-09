@@ -24,8 +24,10 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
   }
 
   if (!isAuthenticated) {
+    // หลังบ้านมีหน้าล็อกอินแยกของแอดมิน (/admin/login) ส่วนหน้าผู้ใช้ใช้ /login
     // Remember where the user was heading so login can redirect back.
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    const loginPath = requireAdmin ? "/admin/login" : "/login";
+    return <Navigate to={loginPath} replace state={{ from: location }} />;
   }
 
   if (requireAdmin && user?.role !== "ADMIN") {

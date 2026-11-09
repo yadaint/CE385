@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
   approvePayment,
+  createStaff,
   getAllBookings,
   getAllPayments,
   getAdminConcerts,
@@ -10,12 +11,18 @@ import {
   getConcertSeatMap,
   getConcertSummary,
   getConcertTickets,
+  getStaffList,
+  getTodayDuty,
   markNotificationsRead,
+  removeStaff,
   rejectPayment,
+  setTodayDuty,
+  verifyStaffAccess,
 } from "../controllers/admin.controller";
 import { uploadCoverImage } from "../config/upload";
 import { authenticate, authorize } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
+import { createStaffSchema } from "../schemas/auth.schema";
 import {
   adminBookingQuerySchema,
   adminConcertParamsSchema,
@@ -25,6 +32,9 @@ import {
   adminTicketQuerySchema,
   markNotificationsReadSchema,
   rejectPaymentSchema,
+  removeStaffSchema,
+  setDutySchema,
+  staffAccessSchema,
 } from "../schemas/admin.schema";
 
 const router = Router();
@@ -37,6 +47,18 @@ router.get("/concerts", getAdminConcerts);
 router.get("/bookings", validate({ query: adminBookingQuerySchema }), getAllBookings);
 router.get("/payments", validate({ query: adminPaymentQuerySchema }), getAllPayments);
 router.get("/notifications", validate({ query: adminNotificationQuerySchema }), getAdminNotifications);
+
+// เพิ่มบัญชีแอดมินใหม่ — อีเมลสร้างอัตโนมัติจากรหัสพนักงาน: admin{รหัส}@domain
+router.post("/staff", validate({ body: createStaffSchema }), createStaff);
+
+// เวรประจำวัน — ล็อกอินแล้วต้องเลือกว่า "วันนี้ใครเป็นคนทำงาน" และแสดงผู้ที่อยู่เวรอยู่
+router.get("/staff", getStaffList);
+router.get("/staff/duty/today", getTodayDuty);
+router.post("/staff/duty", validate({ body: setDutySchema }), setTodayDuty);
+
+// เพิ่ม/ลดแอดมิน — ต้องแนบรหัสยืนยัน 8 ตัว (ADMIN_ACCESS_CODE) ถูกต้องทุกครั้ง
+router.post("/staff/verify-access", validate({ body: staffAccessSchema }), verifyStaffAccess);
+router.post("/staff/remove", validate({ body: removeStaffSchema }), removeStaff);
 
 // อัปโหลดรูปปกคอนเสิร์ต — ขนาดแนะนำ 1200x675 px (16:9) ไม่เกิน 5MB → คืน URL ไฟล์
 router.post("/uploads/cover", uploadCoverImage.single("cover"), (req, res) => {

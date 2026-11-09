@@ -27,19 +27,21 @@ export default function AdminDraftsPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDrafts = async (): Promise<void> => {
-      try {
-        const all = await adminService.getConcerts();
-        setDrafts(all.filter((concert) => concert.saleStatus === "DRAFT"));
-      } catch (err) {
-        setError(getApiErrorMessage(err));
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // โหลดรายการแบบร่างใหม่จากฐานข้อมูล — ใช้ทั้งตอนเปิดหน้าและหลังลบ เพื่อให้ลิสต์ตรงกับ DB เสมอ
+  const loadDrafts = async (): Promise<void> => {
+    try {
+      const all = await adminService.getConcerts();
+      setDrafts(all.filter((concert) => concert.saleStatus === "DRAFT"));
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    void fetchDrafts();
+  useEffect(() => {
+    void loadDrafts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDelete = async (concert: AdminConcert): Promise<void> => {
@@ -53,7 +55,7 @@ export default function AdminDraftsPage() {
     setNotice(null);
     try {
       await adminService.deleteConcert(concert.id);
-      setDrafts((prev) => prev.filter((item) => item.id !== concert.id));
+      await loadDrafts(); // โหลดใหม่ให้ลิสต์ตรงกับฐานข้อมูล (แทนการ filter state เอง)
       setNotice(t("adminDrafts.deleted"));
     } catch (err) {
       setError(getApiErrorMessage(err));

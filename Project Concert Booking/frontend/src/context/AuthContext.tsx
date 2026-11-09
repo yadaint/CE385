@@ -17,6 +17,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  /** ล็อกอินหลังบ้าน — backend ปฏิเสธบัญชีที่ไม่ใช่ ADMIN (403) */
+  adminLogin: (email: string, password: string) => Promise<User>;
   register: (payload: RegisterPayload) => Promise<User>;
   logout: () => void;
   /** ลบบัญชีตัวเอง — ลบการจองทั้งหมดตามไปด้วย แล้วออกจากระบบ */
@@ -62,6 +64,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return loggedInUser;
   }, []);
 
+  /** ล็อกอินหลังบ้าน — ใช้ endpoint /auth/admin/login ที่ปฏิเสธบัญชี USER (403) */
+  const adminLogin = useCallback(async (email: string, password: string): Promise<User> => {
+    const { token, user: loggedInUser } = await authService.adminLogin({ email, password });
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    setUser(loggedInUser);
+    return loggedInUser;
+  }, []);
+
   const register = useCallback(async (payload: RegisterPayload): Promise<User> => {
     // 1) สมัครบัญชี (multipart พร้อมรูปบัตรประชาชนหน้า/หลัง)
     await authService.register(payload);
@@ -94,11 +104,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: user !== null,
       isLoading,
       login,
+      adminLogin,
       register,
       logout,
       deleteAccount,
     }),
-    [user, isLoading, login, register, logout, deleteAccount],
+    [user, isLoading, login, adminLogin, register, logout, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

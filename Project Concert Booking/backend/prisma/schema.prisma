@@ -80,15 +80,19 @@ model User {
   /// ข้อมูลผู้สมัคร (กรอกตอนสมัครสมาชิก — ใช้ยืนยันตัวตนด้วยการกรอกข้อมูล)
   firstName        String?
   lastName         String?
-  phone            String?
+  /// เบอร์โทรศัพท์ — ใช้ได้ 1 บัญชีเท่านั้น (สมัครซ้ำไม่ได้ เว้นแต่ลบบัญชีเดิมออกก่อน)
+  phone            String? @unique
   dateOfBirth      DateTime?
-  /// เลขบัตรประชาชน 13 หลัก (ตรวจ checksum ก่อนบันทึก)
-  nationalId       String?
-  /// เลขหลังบัตรประชาชน (Laser code ด้านหลังบัตร)
-  nationalIdBack   String?
+  /// เลขบัตรประชาชน 13 หลัก (ตรวจ checksum ก่อนบันทึก) — 1 บัตร = 1 บัญชีเท่านั้น
+  nationalId       String? @unique
+  /// เลขหลังบัตรประชาชน (Laser code ด้านหลังบัตร) — ใช้ได้ 1 บัญชีเท่านั้น เช่นเดียวกับเลขหน้าบัตร
+  nationalIdBack   String? @unique
+  /// รหัสพนักงาน (เฉพาะบัญชีแอดมิน/ทีมงาน) — อีเมลจะสร้างจากรหัสนี้: admin{รหัส}@domain
+  employeeId       String? @unique
 
   bookings         Booking[]
   reviewedPayments Payment[] @relation("ReviewedPayments")
+  staffDuties      StaffDuty[]
 }
 
 model Concert {
@@ -274,4 +278,20 @@ model Payment {
   reviewer User?   @relation("ReviewedPayments", fields: [reviewedBy], references: [id])
 
   @@index([status])
+}
+
+/// บันทึกเวรทำงานของแอดมิน — หลังล็อกอินต้องเลือกก่อนว่า "วันนี้ใครเป็นคนทำงาน"
+/// และหลังบ้านจะแสดงว่าใครกำลังอยู่เวร (endedAt = null คือเวรที่ยังเปิดอยู่)
+model StaffDuty {
+  id        String    @id @default(cuid())
+  staffId   String
+  /// วันที่ทำงาน (เก็บเป็นวันที่ล้วน ตัดเวลาทิ้ง)
+  workDate  DateTime  @db.Date
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  staff User @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@index([workDate])
+  @@index([staffId])
 }

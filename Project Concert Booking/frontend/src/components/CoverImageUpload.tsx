@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FiImage, FiUploadCloud } from "react-icons/fi";
 
 import { adminService } from "../services/adminService";
-import { getApiErrorMessage } from "../services/api";
+import { getApiErrorMessage, getUploadUrl } from "../services/api";
 
 interface CoverImageUploadProps {
   /** URL รูปปกปัจจุบัน (เช่น /uploads/covers/xxx.png หรือ https://...) */
@@ -58,7 +58,7 @@ export default function CoverImageUpload({
 
       {value ? (
         <div className="relative overflow-hidden rounded-lg ring-1 ring-slate-200">
-          <img src={value} alt="Concert cover" className="aspect-video w-full object-cover" />
+          <img src={getUploadUrl(value)} alt="Concert cover" className="aspect-video w-full object-cover" />
           <button
             type="button"
             onClick={() => inputRef.current?.click()}

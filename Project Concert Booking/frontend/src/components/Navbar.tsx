@@ -44,8 +44,9 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* เมนูหลัก — มือถืออยู่แถวล่างเต็มกว้าง, จอ md+ อยู่แถวเดียวกัน (ล้นเลื่อนแนวนอน ไม่ตัดบรรทัด) */}
-        <div className="order-3 -mx-4 flex w-full items-center gap-1 overflow-x-auto px-4 pb-1 md:order-none md:mx-0 md:w-auto md:min-w-0 md:flex-1 md:justify-center md:px-0 md:pb-0">
+        {/* เมนูหลัก — มือถืออยู่แถวล่างเต็มกว้าง, จอ md+ อยู่แถวเดียวกับโลโก้
+            ถ้าเมนูล้นจะตัดขึ้นบรรทัดใหม่ให้เอง (flex-wrap) ทุกเมนูมองเห็นและกดได้หมด ไม่ต้องเลื่อน */}
+        <div className="order-3 -mx-4 flex w-full flex-wrap items-center gap-1 px-4 pb-1 md:order-none md:mx-0 md:w-auto md:min-w-0 md:flex-1 md:justify-center md:pb-0">
           {/* เมนู "คอนเสิร์ต" — ซ่อนสำหรับแอดมิน (ดูข้อมูลผ่านเมนูสถิติแทน) */}
           {user?.role !== "ADMIN" && (
             <NavLink to="/" end className={getNavLinkClass}>
@@ -57,25 +58,13 @@ export default function Navbar() {
               {t("navbar.myTickets")}
             </NavLink>
           )}
+          {/* แอดมินเห็นเมนูเว็บผู้ใช้น้อยที่สุด — มีลิงก์เดียวไปหลังบ้าน (เมนูงานแอดมินอยู่ใน AdminNavbar) */}
           {user?.role === "ADMIN" && (
-            <>
-              <NavLink to="/admin" end className={getNavLinkClass}>
-                {t("navbar.stats")}
-              </NavLink>
-              <NavLink to="/admin/drafts" className={getNavLinkClass}>
-                {t("navbar.drafts")}
-              </NavLink>
-              <NavLink to="/admin/payments" className={getNavLinkClass}>
-                {t("navbar.verifySlips")}
-              </NavLink>
-              <NavLink to="/admin/bookings" className={getNavLinkClass}>
-                {t("navbar.allBookings")}
-              </NavLink>
-              <NavLink to="/admin/create-concert" className={getNavLinkClass}>
-                {t("navbar.createConcert")}
-              </NavLink>
-            </>
-          )}        </div>
+            <NavLink to="/admin" className={getNavLinkClass}>
+              {t("navbar.backOffice")}
+            </NavLink>
+          )}
+        </div>
 
         {/* โซนบัญชีผู้ใช้ + ปุ่มภาษา */}
         <div className="flex shrink-0 items-center gap-2">

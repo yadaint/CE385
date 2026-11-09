@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { accessCodeSchema } from "./admin.schema";
+
 /** ตรวจเลขบัตรประชาชนไทย 13 หลักด้วย checksum ตามมาตรฐานกรมการปกครอง */
 export const isValidThaiNationalId = (value: string): boolean => {
   const digits = value.replace(/\D/g, "");
@@ -21,6 +23,15 @@ export const isReasonableBirthDate = (value: Date): boolean => {
   return age >= 12 && age <= 120;
 };
 
+/** กติกาเดียวกันทั้งรหัสผ่านผู้ใช้และพนักงาน — อย่างน้อย 8 ตัว มีตัวเล็ก/ใหญ่/ตัวเลข */
+const passwordSchema = z
+  .string({ required_error: "กรุณากรอกรหัสผ่าน" })
+  .min(8, "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร")
+  .max(72, "รหัสผ่านต้องไม่เกิน 72 ตัวอักษร")
+  .regex(/[a-z]/, "รหัสผ่านต้องมีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว")
+  .regex(/[A-Z]/, "รหัสผ่านต้องมีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว")
+  .regex(/[0-9]/, "รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว");
+
 export const registerSchema = z.object({
   email: z
     .string({ required_error: "กรุณากรอกอีเมล" })
@@ -29,13 +40,7 @@ export const registerSchema = z.object({
     .min(1, "กรุณากรอกอีเมล")
     .email("อีเมลไม่ถูกต้อง")
     .max(255, "อีเมลต้องไม่เกิน 255 ตัวอักษร"),
-  password: z
-    .string({ required_error: "กรุณากรอกรหัสผ่าน" })
-    .min(8, "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร")
-    .max(72, "รหัสผ่านต้องไม่เกิน 72 ตัวอักษร")
-    .regex(/[a-z]/, "รหัสผ่านต้องมีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว")
-    .regex(/[A-Z]/, "รหัสผ่านต้องมีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว")
-    .regex(/[0-9]/, "รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว"),
+  password: passwordSchema,
 
   // ─── ข้อมูลผู้สมัคร ───
   firstName: z
@@ -72,6 +77,38 @@ export const registerSchema = z.object({
     ),
 });
 
+/**
+ * สร้างบัญชีแอดมินใหม่ (จากหลังบ้าน โดยแอดมินที่ล็อกอินอยู่)
+ * ไม่รับอีเมล — ระบบสร้างให้เองจากรหัสพนักงาน: admin{รหัส}@ADMIN_EMAIL_DOMAIN
+ */
+export const createStaffSchema = z.object({
+  firstName: z
+    .string({ required_error: "กรุณากรอกชื่อจริง" })
+    .trim()
+    .min(1, "กรุณากรอกชื่อจริง")
+    .max(100, "ชื่อจริงต้องไม่เกิน 100 ตัวอักษร"),
+  lastName: z
+    .string({ required_error: "กรุณากรอกนามสกุล" })
+    .trim()
+    .min(1, "กรุณากรอกนามสกุล")
+    .max(100, "นามสกุลต้องไม่เกิน 100 ตัวอักษร"),
+  phone: z
+    .string({ required_error: "กรุณากรอกเบอร์โทรศัพท์" })
+    .trim()
+    .regex(/^0\d{8,9}$/, "เบอร์โทรศัพท์ไม่ถูกต้อง (เช่น 0812345678)"),
+  dateOfBirth: z.coerce
+    .date({ invalid_type_error: "กรุณาเลือกวันเดือนปีเกิด" })
+    .refine((date) => isReasonableBirthDate(date), "วันเดือนปีเกิดไม่ถูกต้อง"),
+  /** รหัสพนักงาน — ตัวเลข 4 หลักเท่านั้น (เช่น 0001) ใช้สร้างอีเมล: admin{รหัส}@domain */
+  employeeId: z
+    .string({ required_error: "กรุณากรอกรหัสพนักงาน" })
+    .trim()
+    .regex(/^\d{4}$/, "รหัสพนักงานต้องเป็นตัวเลข 4 หลักเท่านั้น (เช่น 0001)"),
+  password: passwordSchema,
+  /** รหัสยืนยันการเพิ่มแอดมิน (8 ตัว — ฟิคไว้ที่ ADMIN_ACCESS_CODE ต้องถูกทุกครั้ง) */
+  accessCode: accessCodeSchema,
+});
+
 export const loginSchema = z.object({
   email: z
     .string({ required_error: "กรุณากรอกอีเมล" })
@@ -84,3 +121,4 @@ export const loginSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type CreateStaffInput = z.infer<typeof createStaffSchema>;

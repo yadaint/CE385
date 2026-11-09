@@ -3,11 +3,14 @@ import { BrowserRouter, Link, Route, Routes, useLocation } from "react-router-do
 import { useTranslation } from "react-i18next";
 
 import Navbar from "./components/Navbar";
+import AdminNavbar from "./components/AdminNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { LuTicket } from "react-icons/lu";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import AdminCreateConcertPage from "./pages/AdminCreateConcertPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminSeatMapPage from "./pages/AdminSeatMapPage";
+import AdminStaffPage from "./pages/AdminStaffPage";
 import AdminSlipsPage from "./pages/AdminSlipsPage";
 import AdminStatsHomePage from "./pages/AdminStatsHomePage";
 import AdminDraftsPage from "./pages/AdminDraftsPage";
@@ -36,19 +39,40 @@ function ScrollToTop(): null {
 }
 
 export default function App() {
-  const { t } = useTranslation();
   return (
     <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <div className="flex min-h-screen flex-col bg-page">
-          <Navbar />
+        <AppShell />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+/** โครงหน้าเว็บ — เลือกแถบเมนู/footer ตามพื้นที่:
+ *  หลังบ้าน (/admin/*) = AdminNavbar เฉพาะแอดมิน ไม่มี footer เว็บผู้ใช้
+ *  หน้าล็อกอินหลังบ้าน (/admin/login) = ไม่มีแถบเมนูใดทั้งสิ้น มีแต่ฟอร์มเข้าสู่ระบบ
+ *  เว็บไซต์ผู้ใช้ = Navbar + footer เดิม */
+function AppShell() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { pathname } = useLocation();
+
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isAdminLoginPage = pathname === "/admin/login";
+  const isAdminArea = isAdminRoute && !isAdminLoginPage;
+
+  return (
+    <div className="flex min-h-screen flex-col bg-page">
+      {isAdminArea ? <AdminNavbar /> : <Navbar />}
 
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              {/* หน้าล็อกอินหลังบ้าน — ระบบแยกสำหรับแอดมิน (public route) */}
+              <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/concerts/:id" element={<ConcertDetailPage />} />
               <Route
                 path="/my-bookings"
@@ -123,6 +147,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/admin/staff"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminStaffPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/admin/payments"
                 element={
                   <ProtectedRoute requireAdmin>
@@ -142,6 +174,8 @@ export default function App() {
             </Routes>
           </main>
 
+          {/* footer เฉพาะเว็บไซต์ผู้ใช้ — หลังบ้านไม่แสดง */}
+          {!isAdminArea && (
           <footer className="mt-auto border-t border-header-border bg-header text-header-muted">
             <div className="container-page grid grid-cols-1 gap-8 py-10 sm:grid-cols-3">
               {/* แบรนด์ */}
@@ -160,24 +194,26 @@ export default function App() {
                 <p className="mt-3 text-xs leading-relaxed">{t("footer.tagline")}</p>
               </div>
 
-              {/* เมนูลัด */}
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-header-text">
-                  {t("footer.quickLinks")}
-                </p>
-                <ul className="mt-3 flex flex-col gap-2 text-sm">
-                  <li>
-                    <Link to="/" className="transition hover:text-header-text">
-                      {t("footer.linkConcerts")}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/my-bookings" className="transition hover:text-header-text">
-                      {t("footer.linkMyTickets")}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+              {/* เมนูลัด — ซ่อนสำหรับแอดมิน (ไม่มีเมนูฝั่งผู้ใช้ คอนเสิร์ต/ตั๋วของฉัน) */}
+              {user?.role !== "ADMIN" && (
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-header-text">
+                    {t("footer.quickLinks")}
+                  </p>
+                  <ul className="mt-3 flex flex-col gap-2 text-sm">
+                    <li>
+                      <Link to="/" className="transition hover:text-header-text">
+                        {t("footer.linkConcerts")}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/my-bookings" className="transition hover:text-header-text">
+                        {t("footer.linkMyTickets")}
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              )}
 
               {/* เทคโนโลยีที่ใช้ */}
               <div>
@@ -203,8 +239,7 @@ export default function App() {
               </p>
             </div>
           </footer>
+          )}
         </div>
-      </BrowserRouter>
-    </AuthProvider>
   );
 }

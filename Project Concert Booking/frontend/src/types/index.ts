@@ -132,6 +132,8 @@ export interface SeatSummary {
   id: string;
   code: string;
   rowLabel: string;
+  /** รหัสตั๋วประจำที่นั่ง (1 ที่นั่ง = 1 รหัส) — มาพร้อม response จาก withFlatSeats */
+  ticketCode?: string | null;
 }
 
 /** Zone info embedded in a booking response. */
@@ -284,8 +286,14 @@ export interface AdminPayment {
   note: string | null;
   createdAt: string;
   reviewedAt: string | null;
-  /** แอดมินที่ทำการตรวจสอบสลิป (null = ยังไม่ถูกตรวจ) */
-  reviewedBy?: { id: string; email: string } | null;
+  /** แอดมินผู้ตรวจสลิป (null = ยังไม่ถูกตรวจ) — แสดงรหัสพนักงานให้แอดมินทุกคนเห็นว่าใครเป็นคนกด */
+  reviewedBy?: {
+    id: string;
+    email: string;
+    employeeId: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  } | null;
   booking: {
     id: string;
     quantity: number;
