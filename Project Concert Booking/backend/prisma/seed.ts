@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -221,6 +224,17 @@ const DEMO_USERS = [
 
 async function main(): Promise<void> {
   console.log("🌱 กำลัง seed ฐานข้อมูล...");
+
+  // --- คัดลอกสลิปตัวอย่างไปที่ uploads/slips (ให้หน้าตรวจสลิปแสดงภาพได้) ---
+  const demoAssetDir = path.join(__dirname, "demo-assets");
+  const slipDir = path.join(__dirname, "..", "uploads", "slips");
+  fs.mkdirSync(slipDir, { recursive: true });
+  for (const name of ["demo-slip-approved.png", "demo-slip-pending.png", "demo-slip-rejected.png"]) {
+    const src = path.join(demoAssetDir, name);
+    if (fs.existsSync(src) && !fs.existsSync(path.join(slipDir, name))) {
+      fs.copyFileSync(src, path.join(slipDir, name));
+    }
+  }
 
   // --- บัญชีแอดมินเดโม่ (ล็อกอินด้วยอีเมลกลาง + รหัสผ่านส่วนตัว) ------------
   const adminPassword = await bcrypt.hash("Admin1234", 12);
@@ -449,7 +463,13 @@ async function main(): Promise<void> {
           payment: hasPayment
             ? {
                 create: {
-                  slipImage: "/uploads/slips/demo-slip.png",
+                  // สลิปตัวอย่างจริง — ไฟล์อยู่ที่ uploads/slips/demo-slip-*.png (seed คัดลอกให้อัตโนมัติ)
+                  slipImage:
+                    opts.status === "COMPLETED"
+                      ? "/uploads/slips/demo-slip-approved.png"
+                      : opts.status === "REJECTED"
+                        ? "/uploads/slips/demo-slip-rejected.png"
+                        : "/uploads/slips/demo-slip-pending.png",
                   status:
                     opts.status === "COMPLETED"
                       ? "APPROVED"
